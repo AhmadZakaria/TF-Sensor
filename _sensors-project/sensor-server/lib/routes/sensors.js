@@ -72,6 +72,39 @@ module.exports = class Sensors {
     static sensor(request, response, next) {
         let sensor = sensors.get(request.params.sensor);
         let sensorResponse = {
+          id: sensor.id,
+          type: sensor.Type
+            // reading: sensor.reading.tfValue,
+            // timestamp: sensor.reading.timestamp
+        }
+        switch (request.method) {
+            case "GET":
+                response.format({
+                    "application/json": () => {
+                        response.status(200).type("application/json").send(sensorResponse);
+                    },
+                    "default": () => {
+                        next(new httpError.NotAcceptable());
+                    }
+                });
+                break;
+            case "DELETE":
+            case "PUT":
+            case "CONNECT":
+            case "HEAD":
+            case "OPTIONS":
+            case "POST":
+            case "TRACE":
+            default:
+                response.set("allow", "GET, POST");
+                next(new httpError.MethodNotAllowed());
+                break;
+        }
+    }
+
+    static lastSensorReading(request, response, next) {
+        let sensor = sensors.get(request.params.sensor);
+        let sensorResponse = {
             reading: sensor.reading.tfValue,
             timestamp: sensor.reading.timestamp
         }

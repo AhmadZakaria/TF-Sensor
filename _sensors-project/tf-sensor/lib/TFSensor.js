@@ -15,7 +15,8 @@ module.exports = class TFSensor extends Sensor {
     this.ipcon = new Tinkerforge.IPConnection(); // Create IP connection
     this.lastReading = null;
 
-    this.type = this.sensorOptions.type;
+    this._type = this.sensorOptions.type;
+    this._id = this.sensorOptions.UID;
     this.sen = new sensorOptions.ctor(this.sensorOptions.UID, this.ipcon); // Create device object
     this.sen.on(sensorOptions.callbackEvent,
         // Callback function for illuminance callback (parameter has unit Lux/100)

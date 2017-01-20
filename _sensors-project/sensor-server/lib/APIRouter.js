@@ -13,7 +13,7 @@ module.exports = class APIRouter extends require("express").Router {
             parser.json({
                 "inflate": true,
                 "strict": true
-            }), Sensors.sensor);
+            }), Sensors.lastSensorReading);
         this.all("/sensors/:sensor", DefaultRouter.xPoweredBy,
             parser.json({
                 "inflate": true,
