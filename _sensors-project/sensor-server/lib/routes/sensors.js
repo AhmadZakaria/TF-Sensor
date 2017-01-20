@@ -6,7 +6,20 @@ const http = require("http");
 const DummySensor = require("dummy-sensor").DummySensor;
 const TFSensor = require('../../../tf-sensor/lib/TFSensor');
 const TFSensorOptions = require('../../../tf-sensor/lib/TFSensorOptions');
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({
+    port: 8888
+});
 
+wss.broadcast = function broadcast(data) {
+    wss.clients.forEach(function each(client) {
+        if (client.readyState === WebSocket.OPEN) {
+          console.log(data);
+
+            client.send(JSON.stringify(data));
+        }
+    })
+};
 
 let sensors = new Map();
 for (var opts in TFSensorOptions) {
@@ -15,19 +28,28 @@ for (var opts in TFSensorOptions) {
     sensor.onactivate = event => console.log('activated');
     sensor.onchange = event => {
         console.log(
-            `${new Date(event.reading.timestamp).toLocaleTimeString()} ${event.reading.tfValue}`
-        );
-        sensor.reading = event.reading
-    }
-    sensor.start();
-    // setTimeout(
-    //     () => {
-    //         sensor.stop();
-    //     },
-    //     5000
-    // );
-    // sensor.onchange = event => sensor.reading = event.reading;
-    sensors.set(sensor.id, sensor);
+            `${new Date(event.reading.timestamp).toLocaleTimeString()} ${event.reading.tfValue}`);
+        let sensorResponse = {
+            id: sensor.id,
+            type: sensor.Type,
+            reading: event.reading.tfValue,
+            timestamp: event.reading.timestamp
+        };
+
+        wss.broadcast(sensorResponse);
+
+
+sensor.reading = event.reading
+}
+sensor.start();
+// setTimeout(
+//     () => {
+//         sensor.stop();
+//     },
+//     5000
+// );
+// sensor.onchange = event => sensor.reading = event.reading;
+sensors.set(sensor.id, sensor);
 }
 
 Array
@@ -71,14 +93,25 @@ module.exports = class Sensors {
 
     static sensor(request, response, next) {
         let sensor = sensors.get(request.params.sensor);
+
         let sensorResponse = {
-          id: sensor.id,
-          type: sensor.Type
-            // reading: sensor.reading.tfValue,
-            // timestamp: sensor.reading.timestamp
+            id: sensor.id,
+            type: sensor.Type,
+            frequency: sensor.sensorOptions.frequency
         }
+
+      if(sensor == undefined) {
+        response.format({
+            "default": () => {
+                next(new httpError.NotAcceptable());
+            }
+        });
+          return;
+      }
+
         switch (request.method) {
             case "GET":
+
                 response.format({
                     "application/json": () => {
                         response.status(200).type("application/json").send(sensorResponse);
@@ -90,6 +123,18 @@ module.exports = class Sensors {
                 break;
             case "DELETE":
             case "PUT":
+                sensor.stop();
+                sensor.sensorOptions.frequency = parseInt(request.body.frequency);
+                sensor.start();
+                sensorResponse.frequency =sensor.sensorOptions.frequency
+                response.format({
+                    "application/json": () => {
+                        response.status(201).send(sensorResponse);
+                      },                    "default": () => {
+                                              next(new httpError.NotAcceptable());
+                                          }
+                                        });
+                break;
             case "CONNECT":
             case "HEAD":
             case "OPTIONS":
