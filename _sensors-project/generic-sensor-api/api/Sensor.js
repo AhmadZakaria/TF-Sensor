@@ -12,6 +12,7 @@ module.exports = class Sensor {
     }
     this._state = null;
     this._reading = null;
+    this._type = null;
     this._onactivate = event => {};
     this._onchange = event => {};
     this._onerror = event => {};
@@ -45,6 +46,12 @@ module.exports = class Sensor {
   }
   get onactivate() {
     return this._onactivate;
+  }
+  set Type(value) {
+    this._type = value;
+  }
+  get Type() {
+    return this._type;
   }
   set onchange(value) {
     this._onchange = value;

@@ -6,7 +6,6 @@ const Tinkerforge = require('tinkerforge');
 
 const HOST = 'localhost';
 const PORT = 4223;
-const UID = 'yih';
 
 module.exports = class TFSensor extends Sensor {
 
@@ -16,12 +15,13 @@ module.exports = class TFSensor extends Sensor {
     this.ipcon = new Tinkerforge.IPConnection(); // Create IP connection
     this.lastReading = null;
 
-    this.al = new Tinkerforge.BrickletAmbientLightV2(UID, this.ipcon); // Create device object
-    this.al.on(Tinkerforge.BrickletAmbientLightV2.CALLBACK_ILLUMINANCE,
+    this.type = this.sensorOptions.type;
+    this.sen = new sensorOptions.ctor(this.sensorOptions.UID, this.ipcon); // Create device object
+    this.sen.on(sensorOptions.callbackEvent,
         // Callback function for illuminance callback (parameter has unit Lux/100)
-         (illuminance)=> {
+         (measurement)=> {
             // console.log('Illuminance: ' + illuminance/100.0 + ' Lux');
-            this.lastReading = illuminance/100.0;
+            this.lastReading = measurement/this.sensorOptions.normFact
         }
     );
 
@@ -37,7 +37,17 @@ module.exports = class TFSensor extends Sensor {
 
     this.ipcon.on(Tinkerforge.IPConnection.CALLBACK_CONNECTED,
          (connectReason)=> {
-          this.al.setIlluminanceCallbackPeriod(this.sensorOptions.frequency);
+           // set callback for periodic measurement
+          let periodFunc = this.sensorOptions.periodFunc
+          this.sen[periodFunc](this.sensorOptions.frequency);
+
+          // get first reading
+          this.sen[this.sensorOptions.simpleFunc](
+            (measurement)=> {
+               // console.log('Illuminance: ' + illuminance/100.0 + ' Lux');
+               this.lastReading = measurement/this.sensorOptions.normFact
+           }, ()=>{}
+          );
         }
     );
 
