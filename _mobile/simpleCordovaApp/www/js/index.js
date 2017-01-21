@@ -27,6 +27,9 @@ var app = {
     // Bind any cordova events here. Common events are:
     // 'pause', 'resume', etc.
     onDeviceReady: function() {
+        document.querySelector("#showlocation").addEventListener('click', this.addLocation, false);
+        document.querySelector("#capture").addEventListener('click', this.capturePicture, false);
+
         var xhr = new XMLHttpRequest();
         var that = this;
         xhr.onprogress = function () {
@@ -61,6 +64,44 @@ var app = {
             guidelinesUL.appendChild(guidelinesLI);
         }
         guidelinesDiv.appendChild(guidelinesUL);
+    },
+    addLocation: function (event)
+    {
+        event.preventDefault();
+        navigator.geolocation.getCurrentPosition(function (position)
+        {
+            alert(
+                'Latitude: ' + position.coords.latitude + '\n' + 'Longitude: ' + position.coords.longitude + '\n' + 'Altitude: ' + position.coords.altitude + '\n' + 'Accuracy: ' + position.coords.accuracy + '\n' + 'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '\n' + 'Heading: ' + position.coords.heading + '\n' + 'Speed: ' + position.coords.speed + '\n' + 'Timestamp: ' + position.timestamp + '\n');
+        }, function ()
+        {
+            alert('Error getting location');
+        });
+        return false;
+    },
+    capturePicture: function (event)
+    {
+        event.preventDefault();
+        if (!navigator.camera)
+        {
+            alert("Camera API not supported", "Error");
+            return;
+        }
+        var options = {
+            quality: 50,
+            targetWidth: 100,
+            targetHeight: 100,
+            destinationType: Camera.DestinationType.DATA_URL,
+            sourceType: 1,      // 0:Photo Library, 1=Camera, 2=Saved Album
+            encodingType: 0     // 0=JPG 1=PNG
+        };
+        navigator.camera.getPicture(function (imgData)
+        {
+            document.querySelector("#myimg").setAttribute('src', "data:image/jpeg;base64," + imgData);
+        }, function ()
+        {
+            alert('Error taking picture', 'Error');
+        }, options);
+        return false;
     }
 };
 
