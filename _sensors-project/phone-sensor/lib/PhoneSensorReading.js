@@ -4,13 +4,13 @@ const SensorReading = require('generic-sensor-api').SensorReading;
 module.exports = class PhoneSensorReading extends SensorReading {
   constructor(timestamp, value) {
     super(timestamp);
-    this._phoneValue = value;
+    this._value = value;
   }
 
-  get _phoneValue() {
-    return this._dummyValue;
+  get _value() {
+    return this._value;
   }
-  set _phoneValue(value) {
-    this._dummyValue = value;
+  set _value(value) {
+    this._value = value;
   }
 }

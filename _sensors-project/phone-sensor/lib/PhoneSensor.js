@@ -8,6 +8,7 @@ module.exports = class PhoneSensor extends Sensor {
     constructor(sensorOptions) {
         super(sensorOptions);
         this.lastReading = null;
+        this._target = this.sensorOptions.target;
         this._type = this.sensorOptions.type;
         this._id = this.sensorOptions.UID;
         this._intervalHandle = null;

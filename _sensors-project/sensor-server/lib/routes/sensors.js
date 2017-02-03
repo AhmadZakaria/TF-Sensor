@@ -98,7 +98,7 @@ module.exports = class Sensors {
 
                 let sensor;
 
-                if (sensorOptions[sensorOptions.length - 1].target === 'Tinkerforge') {
+                if (request.body.target === 'Tinkerforge') {
                     sensor = new TFSensor(request.body);
                     sensorOptions.put(request.body);
                     var json = JSON.stringify(sensorOptions);
@@ -166,6 +166,9 @@ module.exports = class Sensors {
                 });
                 break;
             case "DELETE":
+                if (sensor.target === 'Tinkerforge') {
+                    sensorOptions = sensorOptions.filter(i=> i.UID!=sensor.id)
+                }
             case "PUT":
                 sensor.stop();
                 sensor.sensorOptions.frequency = parseInt(request.body.frequency);
@@ -186,7 +189,7 @@ module.exports = class Sensors {
             case "POST":
             case "TRACE":
             default:
-                response.set("allow", "GET, POST");
+                response.set("allow", "GET, PUT");
                 next(new httpError.MethodNotAllowed());
                 break;
         }
@@ -195,7 +198,7 @@ module.exports = class Sensors {
     static lastSensorReading(request, response, next) {
         let sensor = sensors.get(request.params.sensor);
         let sensorResponse = {
-            reading: sensor.reading.tfValue,
+            reading: sensor.reading.value,
             timestamp: sensor.reading.timestamp
         }
         switch (request.method) {
@@ -215,6 +218,16 @@ module.exports = class Sensors {
             case "HEAD":
             case "OPTIONS":
             case "POST":
+                sensor.lastReading = parseInt(request.body.lastReading);
+                response.format({
+                    "application/json": () => {
+                        response.status(201).send(sensorResponse);
+                    },
+                    "default": () => {
+                        next(new httpError.NotAcceptable());
+                    }
+                });
+                break;
             case "TRACE":
             default:
                 response.set("allow", "GET, POST");

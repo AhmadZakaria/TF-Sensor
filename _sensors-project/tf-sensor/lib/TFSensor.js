@@ -14,7 +14,7 @@ module.exports = class TFSensor extends Sensor {
     this._intervalHandle = null;
     this.ipcon = new Tinkerforge.IPConnection(); // Create IP connection
     this.lastReading = null;
-
+    this._target = this.sensorOptions.target;
     this._type = this.sensorOptions.type;
     this._id = this.sensorOptions.UID;
     this.sen = new sensorOptions.ctor(this.sensorOptions.UID, this.ipcon); // Create device object
