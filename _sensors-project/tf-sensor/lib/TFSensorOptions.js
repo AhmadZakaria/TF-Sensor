@@ -19,6 +19,8 @@ var TFSensorOptions = {
         simpleFunc: 'getTemperature',
         // sensor UID
         UID: 'tkw'
+        //
+        target: 'Tinkerforge'
     },
 
     ambientLightSensorOptions: {

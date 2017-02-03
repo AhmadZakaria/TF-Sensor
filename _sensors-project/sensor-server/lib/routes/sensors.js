@@ -7,23 +7,40 @@ const DummySensor = require("dummy-sensor").DummySensor;
 const TFSensor = require('../../../tf-sensor/lib/TFSensor');
 const TFSensorOptions = require('../../../tf-sensor/lib/TFSensorOptions');
 const WebSocket = require('ws');
+var fs = require('fs');
+
 const wss = new WebSocket.Server({
     port: 8888
 });
 
+
 wss.broadcast = function broadcast(data) {
     wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
-          console.log(data);
+            console.log(data);
 
             client.send(JSON.stringify(data));
         }
     })
 };
 
+let sensorOptions = [];
 let sensors = new Map();
-for (var opts in TFSensorOptions) {
-    let sensor = new TFSensor(TFSensorOptions[opts]);
+
+//Load TFSensorOptions out of file
+fs.readFile('TFSensorOptions.json', 'utf8', function readFileCallback(err, data) {
+    if (err) {
+        console.log(err);
+    } else {
+        sensorOptions = JSON.parse(data);
+    }
+});
+
+
+
+
+for (var opts in sensorOptions) {
+    let sensor = new TFSensor(sensorOptions[opts]);
 
     sensor.onactivate = event => console.log('activated');
     sensor.onchange = event => {
@@ -39,17 +56,17 @@ for (var opts in TFSensorOptions) {
         wss.broadcast(sensorResponse);
 
 
-sensor.reading = event.reading
-}
-sensor.start();
-// setTimeout(
-//     () => {
-//         sensor.stop();
-//     },
-//     5000
-// );
-// sensor.onchange = event => sensor.reading = event.reading;
-sensors.set(sensor.id, sensor);
+        sensor.reading = event.reading
+    }
+    sensor.start();
+    // setTimeout(
+    //     () => {
+    //         sensor.stop();
+    //     },
+    //     5000
+    // );
+    // sensor.onchange = event => sensor.reading = event.reading;
+    sensors.set(sensor.id, sensor);
 }
 
 Array
@@ -78,6 +95,33 @@ module.exports = class Sensors {
                 });
                 break;
             case "POST":
+
+                let sensor;
+
+                if (sensorOptions[sensorOptions.length - 1].target === 'Tinkerforge') {
+                    sensor = new TFSensor(request.body);
+                    sensorOptions.put(request.body);
+                    var json = JSON.stringify(sensorOptions);
+                    fs.writeFile('TFSensorOptions.json', json, 'utf8', callback);
+
+
+                } else {
+                    sensor = new PhoneSensor(request.body);
+                }
+
+                sensor.start();
+                sensors.set(sensor.id, sensor);
+
+
+                response.format({
+                    "application/json": () => {
+                        response.status(201).send(sensorResponse);
+                    },
+                    "default": () => {
+                        next(new httpError.NotAcceptable());
+                    }
+                });
+                break;
             case "CONNECT":
             case "DELETE":
             case "HEAD":
@@ -100,14 +144,14 @@ module.exports = class Sensors {
             frequency: sensor.sensorOptions.frequency
         }
 
-      if(sensor == undefined) {
-        response.format({
-            "default": () => {
-                next(new httpError.NotAcceptable());
-            }
-        });
-          return;
-      }
+        if (sensor == undefined) {
+            response.format({
+                "default": () => {
+                    next(new httpError.NotAcceptable());
+                }
+            });
+            return;
+        }
 
         switch (request.method) {
             case "GET":
@@ -126,14 +170,15 @@ module.exports = class Sensors {
                 sensor.stop();
                 sensor.sensorOptions.frequency = parseInt(request.body.frequency);
                 sensor.start();
-                sensorResponse.frequency =sensor.sensorOptions.frequency
+                sensorResponse.frequency = sensor.sensorOptions.frequency
                 response.format({
                     "application/json": () => {
                         response.status(201).send(sensorResponse);
-                      },                    "default": () => {
-                                              next(new httpError.NotAcceptable());
-                                          }
-                                        });
+                    },
+                    "default": () => {
+                        next(new httpError.NotAcceptable());
+                    }
+                });
                 break;
             case "CONNECT":
             case "HEAD":
