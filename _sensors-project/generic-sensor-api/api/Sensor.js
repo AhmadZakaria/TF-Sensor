@@ -5,13 +5,14 @@ const SensorState = require('./SensorState');
 
 module.exports = class Sensor {
   constructor(sensorOptions) {
-    this._id = uuid();
+  
     this._sensorOptions = sensorOptions || {};
     if(this.sensorOptions.frequency === 'undefined') {
       this.sensorOptions.frequency = 500;
     }
     this._state = null;
     this._reading = null;
+    this._type = null;
     this._onactivate = event => {};
     this._onchange = event => {};
     this._onerror = event => {};
@@ -45,6 +46,12 @@ module.exports = class Sensor {
   }
   get onactivate() {
     return this._onactivate;
+  }
+  set Type(value) {
+    this._type = value;
+  }
+  get Type() {
+    return this._type;
   }
   set onchange(value) {
     this._onchange = value;
