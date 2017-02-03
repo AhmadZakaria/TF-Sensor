@@ -83,6 +83,12 @@ module.exports = class Sensors {
     static sensors(request, response, next) {
         switch (request.method) {
             case "GET":
+                sensorsResponse = Array
+                    .from(sensors.keys())
+                    .map(id => ({
+                        id: id
+                    }));
+                console.log("GET");
                 response.format({
                     "application/json": () => {
                         response.status(200).json({
@@ -100,9 +106,9 @@ module.exports = class Sensors {
 
                 if (request.body.target === 'Tinkerforge') {
                     sensor = new TFSensor(request.body);
-                    sensorOptions.put(request.body);
+                    sensorOptions.push(request.body);
                     var json = JSON.stringify(sensorOptions);
-                    fs.writeFile('TFSensorOptions.json', json, 'utf8', callback);
+                     fs.writeFile('TFSensorOptions.json', json, 'utf8', ()=>console.log("Writing successful!"));
 
 
                 } else {
@@ -111,11 +117,15 @@ module.exports = class Sensors {
 
                 sensor.start();
                 sensors.set(sensor.id, sensor);
-
+                sensorsResponse = Array
+                    .from(sensors.keys())
+                    .map(id => ({
+                        id: id
+                    }));
 
                 response.format({
                     "application/json": () => {
-                        response.status(201).send(sensorResponse);
+                        response.status(201).send(sensorsResponse);
                     },
                     "default": () => {
                         next(new httpError.NotAcceptable());

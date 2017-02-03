@@ -17,12 +17,12 @@ module.exports = class TFSensor extends Sensor {
     this._target = this.sensorOptions.target;
     this._type = this.sensorOptions.type;
     this._id = this.sensorOptions.UID;
-    this.sen = new sensorOptions.ctor(this.sensorOptions.UID, this.ipcon); // Create device object
-    this.sen.on(sensorOptions.callbackEvent,
+    this.sen = new Tinkerforge[sensorOptions.ctor](this.sensorOptions.UID, this.ipcon); // Create device object
+    this.sen.on(Tinkerforge[sensorOptions.ctor][sensorOptions.callbackEvent],
         // Callback function for illuminance callback (parameter has unit Lux/100)
          (measurement)=> {
-            // console.log('Illuminance: ' + illuminance/100.0 + ' Lux');
             this.lastReading = measurement/this.sensorOptions.normFact
+            console.log(this._type+': ' + this.lastReading + ' Lux');
         }
     );
 

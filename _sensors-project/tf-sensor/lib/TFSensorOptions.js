@@ -18,7 +18,7 @@ var TFSensorOptions = {
         // direct get measurement function name
         simpleFunc: 'getTemperature',
         // sensor UID
-        UID: 'tkw'
+        UID: 'tkw',
         //
         target: 'Tinkerforge'
     },

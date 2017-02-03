@@ -1,0 +1,11 @@
+[{
+    "type": "Sound Intensity Sensor",
+    "ctor": "BrickletSoundIntensity",
+    "normFact": "1.0",
+    "callbackEvent": "CALLBACK_INTENSITY",
+    "frequency": "500",
+    "periodFunc": "setIntensityCallbackPeriod",
+    "simpleFunc": "getIntensity",
+    "UID": "vqY",
+    "target": "Tinkerforge"
+}]
