@@ -1,0 +1,303 @@
+<html>
+
+<head>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {
+            'packages': ['gauge', 'line']
+        });
+        google.charts.setOnLoadCallback(drawChart);
+
+        var dataMap = new Map();
+        dataMap.set('tkw', []);
+        dataMap.set('xDM', []);
+        dataMap.set('vqY', []);
+        dataMap.set('yih', []);
+
+        function drawChart() {
+
+            var data5 = new google.visualization.DataTable();
+            data5.addColumn('date', 'Timestamp');
+            data5.addColumn('number', 'Illuminance (Lux)');
+
+            now = new Date();
+            // data5.addRows([
+            //     [now, 37.8],
+            //     [new Date(now.getTime() + 10000), 30.9],
+            //     [new Date(now.getTime() + 15000), 25.4],
+            //     [new Date(now.getTime() + 20000), 11.7],
+            //     [new Date(now.getTime() + 25000), 11.9],
+            //     [new Date(now.getTime() + 30000), 8.8],
+            //     [new Date(now.getTime() + 35000), 7.6],
+            //     [new Date(now.getTime() + 40000), 4.2]
+            // ]);
+
+            var options = {
+
+                width: 400,
+                height: 200
+            };
+
+            var chart5 = new google.charts.Line(document.getElementById('linechart_material'));
+
+            chart5.draw(data5, options);
+
+
+            var data1 = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['Temperature', 80],
+            ]);
+
+            var data2 = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['Sound', 55],
+            ]);
+
+            var data3 = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['Light', 68],
+            ]);
+            var data4 = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['Humidity', 68]
+            ]);
+
+            var options = {
+                // width: 600, height: 520,
+                redFrom: 90,
+                redTo: 100,
+                yellowFrom: 75,
+                yellowTo: 90,
+                minorTicks: 5
+            };
+
+            var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+            var chart2 = new google.visualization.Gauge(document.getElementById('chart2_div'));
+            var chart3 = new google.visualization.Gauge(document.getElementById('chart3_div'));
+            var chart4 = new google.visualization.Gauge(document.getElementById('chart4_div'));
+
+            chart.draw(data1, options);
+            chart2.draw(data2, options);
+            chart3.draw(data3, options);
+            chart4.draw(data4, options);
+
+            setInterval(function() {
+              let newval = 40 + Math.round(60 * Math.random());
+                data1.setValue(0, 1, newval);
+                data5.addRows([[new Date(),newval]])
+                chart5.draw(data5, options);
+                chart.draw(data1, options);
+            }, 500);
+            setInterval(function() {
+                data2.setValue(0, 1, 40 + Math.round(60 * Math.random()));
+                chart2.draw(data2, options);
+            }, 500);
+            setInterval(function() {
+                data3.setValue(0, 1, 60 + Math.round(20 * Math.random()));
+                chart3.draw(data3, options);
+            }, 500);
+            setInterval(function() {
+                data4.setValue(0, 1, 60 + Math.round(20 * Math.random()));
+                chart4.draw(data4, options);
+            }, 500);
+        }
+
+        var wsUri = "ws://0.0.0.0:8888";
+        var output;
+
+        function init() {
+            output = document.getElementById("output");
+            testWebSocket();
+        }
+
+        function testWebSocket() {
+            websocket = new WebSocket(wsUri);
+            websocket.onopen = function(evt) {
+                onOpen(evt)
+            };
+            websocket.onclose = function(evt) {
+                onClose(evt)
+            };
+            websocket.onmessage = function(evt) {
+                onMessage(evt)
+            };
+            websocket.onerror = function(evt) {
+                onError(evt)
+            };
+        }
+
+        function onOpen(evt) {
+            writeToScreen("CONNECTED");
+            doSend("WebSocket rocks");
+        }
+
+        function onClose(evt) {
+            writeToScreen("DISCONNECTED");
+        }
+
+        function onMessage(evt) {
+            dataRec = evt.data;
+            dataMap.get(dataRec.id).push([dataRec.timestamp,dataRec.reading])
+            updateChart(dataRec.id)
+            websocket.close();
+        }
+
+        function onError(evt) {
+            writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+        }
+
+        function doSend(message) {
+            vqY
+            writeToScreen("SENT: " + message);
+            websocket.send(message);
+        }
+
+        function writeToScreen(message) {
+            // var pre = document.createElement("p");
+            // pre.style.wordWrap = "break-word";
+            // pre.innerHTML = message;
+            // output.appendChild(pre);
+        }
+
+        window.addEventListener("load", init, false);
+    </script>
+</head>
+
+<body>
+    <div class="row">
+
+        <div class="col s6">
+            <h2 class="header">
+               <span class="pink-text text-darken-2">Temperature</span>
+             </h2>
+            <div class="card horizontal">
+                <div class="card-image">
+                    <div id="chart_div" style="width: 120px; height: 120px;"></div>
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <table id="vertical-1">
+                            <caption>Sensor Details</caption>
+                            <tr>
+                                <th>Name</th>
+                                <td>'Temperature Sensor'</td>
+                            </tr>
+                            <tr>
+                                <th>ID</th>
+                                <td>'tkw'</td>
+                            </tr>
+
+                        </table>
+                    </div>
+                    <div class="card-action">
+                        <a href="#">This is a link</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col s6 ">
+            <h2 class="header">
+              <span class="blue-text text-darken-2">Sound</span>
+            </h2>
+            <div class="card horizontal">
+                <div class="card-image">
+                    <div id="chart2_div" style="width: 120px; height: 120px;"></div>
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content">
+                        <table id="vertical-1">
+                            <caption>Sensor Details</caption>
+                            <tr>
+                                <th>Name</th>
+                                <td>'Sound Sensor'</td>
+                            </tr>
+                            <tr>
+                                <th>ID</th>
+                                <td>'vqY'</td>
+                            </tr>
+
+                        </table>
+                    </div>
+                    <div class="card-action">
+                        <a href="#">This is a link</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+
+
+            <div class="col s6 ">
+                <h2 class="header">
+                  <span class="yellow-text text-darken-2">Light</span>
+                </h2>
+                <div class="card horizontal">
+                    <div class="card-image">
+                        <div id="chart3_div" style="width: 120px; height: 120px;"></div>
+                    </div>
+                    <div class="card-stacked">
+                        <div class="card-content">
+                            <table id="vertical-1">
+                                <caption>Sensor Details</caption>
+                                <tr>
+                                    <th>Name</th>
+                                    <td>'Light Sensor'</td>
+                                </tr>
+                                <tr>
+                                    <th>ID</th>
+                                    <td>'yih'</td>
+                                </tr>
+
+                            </table>
+                        </div>
+                        <div class="card-action">
+                            <caption>Realtime measurements</caption>
+                            <div id="linechart_material" style="width: 220px; height: 220px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col s6">
+                <h2 class="header">
+                  <span class="green-text text-darken-2">Humidity</span>
+                </h2>
+                <div class="card horizontal">
+                    <div class="card-image">
+                        <div id="chart4_div" style="width: 120px; height: 120px;"></div>
+                    </div>
+                    <div class="card-stacked">
+                        <div class="card-content">
+                            <table id="vertical-1">
+                                <caption>Sensor Details</caption>
+                                <tr>
+                                    <th>Name</th>
+                                    <td>'Humidity Sensor'</td>
+                                </tr>
+                                <tr>
+                                    <th>ID</th>
+                                    <td>'xDM'</td>
+                                </tr>
+
+                            </table>
+                        </div>
+                        <div class="card-action">
+                            <a href="#">This is a link</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+</body>
+
+</html>
