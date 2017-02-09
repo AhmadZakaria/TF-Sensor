@@ -1,6 +1,6 @@
 'use strict';
 
-const uuid = require('uuid/v1');
+// const uuid = require('uuid/v1');
 const SensorState = require('./SensorState');
 
 module.exports = class Sensor {

@@ -92,7 +92,6 @@ module.exports = class Sensors {
                     .map(id => ({
                         id: id
                     }));
-                console.log("GET");
                 response.format({
                     "application/json": () => {
                         response.status(200).json({

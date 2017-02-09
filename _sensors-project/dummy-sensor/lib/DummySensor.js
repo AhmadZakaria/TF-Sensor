@@ -1,6 +1,6 @@
 'use strict';
 
-const Sensor = require('generic-sensor-api').Sensor;
+const Sensor = require('../../generic-sensor-api').Sensor;
 const DummySensorReading = require('./DummySensorReading');
 
 module.exports = class DummySensor extends Sensor {
