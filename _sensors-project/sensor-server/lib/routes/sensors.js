@@ -38,14 +38,15 @@ module.exports = class Sensors {
         this._sensors = new Map();
 
         //Load TFSensorOptions out of file
-        fs.readFile('TFSensorOptions.json', 'utf8', function readFileCallback(err, data) {
-            if (err) {
-                console.log(err);
-            } else {
-                this._sensorOptions = JSON.parse(data);
-            }
-        });
+        var content = fs.readFileSync('TFSensorOptions.json', 'utf8');
 
+        if (content != "") {
+            console.log(JSON.parse(content));
+
+            this._sensorOptions = JSON.parse(content);
+        }
+
+        //Initialise loaded sensors
         for (var opts in this._sensorOptions) {
             let sensor = new this._typeHardwareSensor(this._sensorOptions[opts]);
 
@@ -104,13 +105,15 @@ module.exports = class Sensors {
                 break;
             case "POST":
 
+                //toDO: POST of same UID --> abort
+
                 let sensor;
 
                 if (request.body.target === 'Tinkerforge') {
                     sensor = new this._typeHardwareSensor(request.body);
                     this._sensorOptions.push(request.body);
                     var json = JSON.stringify(this._sensorOptions);
-                    fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
+                    fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful (sensors POST" + sensor.id + " )!"));
 
 
                 } else {
@@ -151,7 +154,7 @@ module.exports = class Sensors {
 
     //Single Sensor need ID (GET[ID;TYPE;FREQUENCY], PUT[UPDATE SENSOR])
     sensor(request, response, next) {
-        let sensor = this._sensors.get(request.params.sensor);
+        let sensor = this._sensors.get(request.params.sensor.id);
         let sensorResponse = {
             id: sensor.id,
             type: sensor.Type,
@@ -169,7 +172,6 @@ module.exports = class Sensors {
 
         switch (request.method) {
             case "GET":
-
                 response.format({
                     "application/json": () => {
                         response.status(200).type("application/json").send(sensorResponse);

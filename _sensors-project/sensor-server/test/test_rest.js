@@ -7,70 +7,90 @@ const RequestMock = require("./Mocks/RequestMock")
 const TFSensorOptions = require("./Mocks/TFSensorOptions")
 
 describe('Sensor Rest Service', function () {
-    it('should return instanceof Sensors', function () {
+    describe('Sensors', function () {
+        it('should return instanceof Sensors', function () {
 
-        let sensors = new Sensors(DummySensor, DummySensor);
+            let sensors = new Sensors(DummySensor, DummySensor);
 
-        assert.equal(sensors instanceof Sensors, true);
+            assert.equal(sensors instanceof Sensors, true);
+        });
+        it('GET 0 Sensors', function () {
+
+            let sensors = new Sensors(DummySensor, DummySensor);
+
+            var request = new RequestMock("GET");
+            var response = new ResponseMock();
+
+
+            sensors.sensors(request, response);
+
+            response.formatData["application/json"]();
+
+            assert.equal(response.responseData.data["sensors"].length, 0);
+        });
+        it('GET 1 sensor', function () {
+
+            let sensors = new Sensors(DummySensor, DummySensor);
+
+            var request = new RequestMock("POST");
+            request.body = TFSensorOptions.temperatureSensorOptions;
+
+            var response = new ResponseMock();
+
+            sensors.sensors(request, response);
+
+            response.formatData["application/json"]();
+
+            assert.equal(response.responseData.data[0].id, request.body.UID);
+            assert.equal(response.HTTPCODE, 201);
+        });
+        it('GET 2 sensors', function () {
+
+            let sensors = new Sensors(DummySensor, DummySensor);
+
+            var request = new RequestMock("POST");
+            request.body = TFSensorOptions.ambientLightSensorOptions;
+
+            var response = new ResponseMock();
+
+            sensors.sensors(request, response);
+
+            request = new RequestMock("GET");
+            response = new ResponseMock();
+
+
+            sensors.sensors(request, response);
+
+            response.formatData["application/json"]();
+
+            assert.equal(response.responseData.data["sensors"].length, 2);
+            assert.equal(response.HTTPCODE, 200);
+        });
     });
-    it('should return 0 Sensors', function () {
+    describe('Sensor', function () {
+        it('GET 1 sensor', function () {
+            let sensors = new Sensors(DummySensor, DummySensor);
 
-        let sensors = new Sensors(DummySensor, DummySensor);
+         
+            //Getting Sensor Details
+            request = new RequestMock("GET");
+            request.params = {
+                sensor: {
+                    id: TFSensorOptions.temperatureSensorOptions.UID,
+                    type: TFSensorOptions.temperatureSensorOptions.type,
+                    frequency: TFSensorOptions.temperatureSensorOptions.frequency
+                }
+            }
 
-        var request = new RequestMock("GET");
-        var response = new ResponseMock();
 
+            response = new ResponseMock();
 
-        sensors.sensors(request, response);
+            sensors.sensor(request, response);
 
-        response.formatData["application/json"]();
+            response.formatData["application/json"]();
 
-        assert.equal(response.responseData.data["sensors"].length,0);
+            assert.equal(response.HTTPCODE, 200);
+
+        });
     });
-    it('add one sensor', function () {
-
-        let sensors = new Sensors(DummySensor, DummySensor);
-
-        var request = new RequestMock("POST");
-        request.body = TFSensorOptions.temperatureSensorOptions;
-
-        var response = new ResponseMock();
-
-        sensors.sensors(request, response);
-
-        response.formatData["application/json"]();        
-
-        assert.equal(response.responseData.data[0].id,request.body.UID);
-        assert.equal(response.HTTPCODE,201);
-    });
-     it('get list with two sensor', function () {
-
-        let sensors = new Sensors(DummySensor, DummySensor);
-
-        var request = new RequestMock("POST");
-        request.body = TFSensorOptions.temperatureSensorOptions;
-
-        var response = new ResponseMock();
-
-        sensors.sensors(request, response);
-
-        request = new RequestMock("POST");
-        request.body = TFSensorOptions.ambientLightSensorOptions;
-
-        response = new ResponseMock();
-
-        sensors.sensors(request, response);
-
-        request = new RequestMock("GET");
-        response = new ResponseMock();
-
-
-        sensors.sensors(request, response);
-
-        response.formatData["application/json"]();
-
-        assert.equal(response.responseData.data["sensors"].length,2);
-        assert.equal(response.HTTPCODE,200);
-    });
-
 });

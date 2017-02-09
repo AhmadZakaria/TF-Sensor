@@ -12,7 +12,12 @@ module.exports = class ResponseMock {
             },
             json: function (data) {
                 this.data = data;
+            },
+            type:function (type){
+                return this;
             }
+
+
         };
         this.HTTPCODE; { };
     }
