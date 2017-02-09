@@ -20,7 +20,9 @@ var TFSensorOptions = {
         // sensor UID
         UID: 'tkw',
         //
-        target: 'Tinkerforge'
+        target: 'Tinkerforge',
+        //
+        active: true
     },
 
     ambientLightSensorOptions: {

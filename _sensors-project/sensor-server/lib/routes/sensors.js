@@ -79,6 +79,7 @@ let sensorsResponse = Array
         id: id
     }));
 
+//Operations for all Sensors (GET LIST, POST NEW SENSOR)
 module.exports = class Sensors {
     static sensors(request, response, next) {
         switch (request.method) {
@@ -115,7 +116,11 @@ module.exports = class Sensors {
                     sensor = new PhoneSensor(request.body);
                 }
 
-                sensor.start();
+                if(request.body.active == true)
+                {
+                    sensor.start();
+                }
+
                 sensors.set(sensor.id, sensor);
                 sensorsResponse = Array
                     .from(sensors.keys())
@@ -145,6 +150,7 @@ module.exports = class Sensors {
         }
     }
 
+//Single Sensor need ID (GET[ID;TYPE;FREQUENCY], PUT[UPDATE SENSOR])
     static sensor(request, response, next) {
         let sensor = sensors.get(request.params.sensor);
 
@@ -178,15 +184,51 @@ module.exports = class Sensors {
             case "DELETE":
                 if (sensor.target === 'Tinkerforge') {
                     sensorOptions = sensorOptions.filter(i=> i.UID!=sensor.id)
+                    var json = JSON.stringify(sensorOptions);
+                     fs.writeFile('TFSensorOptions.json', json, 'utf8', ()=>console.log("Writing successful!"));
                 }
+
+                sensors.delete(sensor.id);
+
             case "PUT":
                 sensor.stop();
-                sensor.sensorOptions.frequency = parseInt(request.body.frequency);
-                sensor.start();
-                sensorResponse.frequency = sensor.sensorOptions.frequency
+
+                if(request.body.target != sensor.target )
+                {
+                  //Not allowed
+                  break;
+                }
+
+                sensors.delete(sensor.id);
+
+                if (request.body.target === 'Tinkerforge') {
+
+                    sensorOptions = sensorOptions.filter(i=> i.UID!=sensor.id)
+                    sensor = new TFSensor(request.body);
+                    sensorOptions.push(request.body);
+                    var json = JSON.stringify(sensorOptions);
+                     fs.writeFile('TFSensorOptions.json', json, 'utf8', ()=>console.log("Writing successful!"));
+
+
+                } else {
+                    sensor = new PhoneSensor(request.body);
+                }
+
+                if(request.body.active == true)
+                {
+                    sensor.start();
+                }
+
+                sensors.set(sensor.id, sensor);
+                sensorsResponse = Array
+                    .from(sensors.keys())
+                    .map(id => ({
+                        id: id
+                    }));
+
                 response.format({
                     "application/json": () => {
-                        response.status(201).send(sensorResponse);
+                        response.status(201).send(sensorsResponse);
                     },
                     "default": () => {
                         next(new httpError.NotAcceptable());
