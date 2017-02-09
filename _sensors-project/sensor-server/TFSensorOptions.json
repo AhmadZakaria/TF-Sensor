@@ -1,11 +1,1 @@
-[{
-    "type": "Sound Intensity Sensor",
-    "ctor": "BrickletSoundIntensity",
-    "normFact": "1.0",
-    "callbackEvent": "CALLBACK_INTENSITY",
-    "frequency": "500",
-    "periodFunc": "setIntensityCallbackPeriod",
-    "simpleFunc": "getIntensity",
-    "UID": "vqY",
-    "target": "Tinkerforge"
-}]
+[{"type":"Temperature Sensor","ctor":"Tinkerforge.BrickletTemperature","normFact":100,"callbackEvent":"Tinkerforge.BrickletTemperature.CALLBACK_TEMPERATURE","frequency":500,"periodFunc":"setTemperatureCallbackPeriod","simpleFunc":"getTemperature","UID":"tkw","target":"Tinkerforge","active":true}]

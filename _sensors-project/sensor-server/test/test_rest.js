@@ -4,6 +4,7 @@ const Sensors = require("../lib/routes/sensors");
 const http = require("http");
 const ResponseMock = require("./Mocks/ResponseMock")
 const RequestMock = require("./Mocks/RequestMock")
+const TFSensorOptions = require("./Mocks/TFSensorOptions")
 
 describe('Sensor Rest Service', function () {
     it('should return instanceof Sensors', function () {
@@ -25,5 +26,21 @@ describe('Sensor Rest Service', function () {
         response.formatData["application/json"]();
 
         assert.equal(response.responseData.data["sensors"].length,0);
+    });
+    it('add one sensor', function () {
+
+        let sensors = new Sensors(DummySensor, DummySensor);
+
+        var request = new RequestMock("POST");
+        request.body = TFSensorOptions.temperatureSensorOptions;
+
+        var response = new ResponseMock();
+
+        sensors.sensors(request, response);
+
+        response.formatData["application/json"]();        
+
+        assert.equal(response.responseData.data[0].id,request.body.UID);
+        assert.equal(response.HTTPCODE,201);
     });
 });

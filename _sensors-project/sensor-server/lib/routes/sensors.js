@@ -47,7 +47,7 @@ module.exports = class Sensors {
         });
 
         for (var opts in this._sensorOptions) {
-            let sensor = new _typeHardwareSensor(this._sensorOptions[opts]);
+            let sensor = new this._typeHardwareSensor(this._sensorOptions[opts]);
 
             sensor.onactivate = event => console.log('activated');
             sensor.onchange = event => {
@@ -84,7 +84,6 @@ module.exports = class Sensors {
 
     sensors(request, response, next) {
         let sensorsResponse;
-
         switch (request.method) {
             case "GET":
                 sensorsResponse = Array
@@ -108,14 +107,14 @@ module.exports = class Sensors {
                 let sensor;
 
                 if (request.body.target === 'Tinkerforge') {
-                    sensor = new _typeHardwareSensor(request.body);
+                    sensor = new this._typeHardwareSensor(request.body);
                     this._sensorOptions.push(request.body);
                     var json = JSON.stringify(this._sensorOptions);
                     fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
 
 
                 } else {
-                    sensor = new _typePhoneSensor(request.body);
+                    sensor = new this._typePhoneSensor(request.body);
                 }
 
                 if (request.body.active == true) {
@@ -123,8 +122,7 @@ module.exports = class Sensors {
                 }
 
                 this._sensors.set(sensor.id, sensor);
-                sensorsResponse = Array
-                    .from(this._sensors.keys())
+                sensorsResponse = Array.from(this._sensors.keys())
                     .map(id => ({
                         id: id
                     }));
@@ -203,14 +201,14 @@ module.exports = class Sensors {
                 if (request.body.target === 'Tinkerforge') {
 
                     this._sensorOptions = this._sensorOptions.filter(i => i.UID != sensor.id)
-                    sensor = new _typeHardwareSensor(request.body);
+                    sensor = new this._typeHardwareSensor(request.body);
                     this._sensorOptions.push(request.body);
                     var json = JSON.stringify(this._sensorOptions);
                     fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
 
 
                 } else {
-                    sensor = new _typePhoneSensor(request.body);
+                    sensor = new this._typePhoneSensor(request.body);
                 }
 
                 if (request.body.active == true) {
