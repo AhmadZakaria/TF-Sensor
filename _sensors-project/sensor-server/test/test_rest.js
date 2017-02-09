@@ -43,4 +43,34 @@ describe('Sensor Rest Service', function () {
         assert.equal(response.responseData.data[0].id,request.body.UID);
         assert.equal(response.HTTPCODE,201);
     });
+     it('get list with two sensor', function () {
+
+        let sensors = new Sensors(DummySensor, DummySensor);
+
+        var request = new RequestMock("POST");
+        request.body = TFSensorOptions.temperatureSensorOptions;
+
+        var response = new ResponseMock();
+
+        sensors.sensors(request, response);
+
+        request = new RequestMock("POST");
+        request.body = TFSensorOptions.ambientLightSensorOptions;
+
+        response = new ResponseMock();
+
+        sensors.sensors(request, response);
+
+        request = new RequestMock("GET");
+        response = new ResponseMock();
+
+
+        sensors.sensors(request, response);
+
+        response.formatData["application/json"]();
+
+        assert.equal(response.responseData.data["sensors"].length,2);
+        assert.equal(response.HTTPCODE,200);
+    });
+
 });

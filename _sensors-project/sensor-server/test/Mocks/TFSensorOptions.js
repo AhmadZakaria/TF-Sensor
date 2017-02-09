@@ -39,7 +39,11 @@ var TFSensorOptions = {
         // direct get measurement function name
         simpleFunc: 'getIlluminance',
         // sensor UID
-        UID: 'yih'
+        UID: 'yih',
+        //
+        target: 'Tinkerforge',
+        //
+        active: true
     },
 
     humiditySensorOptions: {
@@ -57,7 +61,11 @@ var TFSensorOptions = {
         // direct get measurement function name
         simpleFunc: 'getHumidity',
         // sensor UID
-        UID: 'xDM'
+        UID: 'xDM',
+        //
+        target: 'Tinkerforge',
+        //
+        active: true
     },
     soundSensorOptions: {
         type: "Sound Intensity Sensor",
@@ -74,7 +82,11 @@ var TFSensorOptions = {
         // direct get measurement function name
         simpleFunc: 'getIntensity',
         // sensor UID
-        UID: 'vqY'
+        UID: 'vqY',
+        //
+        target: 'Tinkerforge',
+        //
+        active: true
     }
 
 };
