@@ -30,15 +30,13 @@ module.exports = class PhoneSensor extends Sensor {
             );
             resolve();
         });
-    });
-}
+    };
 
 handleStopped() {
     return new Promise((resolve, reject) => {
         clearInterval(this._intervalHandle);
         resolve();
     });
-}
-
+};
 
 }

@@ -3,11 +3,13 @@
 const uuid = require("uuid");
 const httpError = require("http-errors");
 const http = require("http");
-const DummySensor = require("dummy-sensor").DummySensor;
-const TFSensor = require('../../../tf-sensor/lib/TFSensor');
-const TFSensorOptions = require('../../../tf-sensor/lib/TFSensorOptions');
+// const TFSensor = require('../../../tf-sensor/lib/TFSensor');
+// const PhoneSensor = require('../../../phone-sensor/lib/PhoneSensor');
 const WebSocket = require('ws');
-var fs = require('fs');
+const fs = require('fs');
+
+//const TFSensorOptions = require('../../../tf-sensor/lib/TFSensorOptions');
+
 
 const wss = new WebSocket.Server({
     port: 8888
@@ -18,74 +20,75 @@ wss.broadcast = function broadcast(data) {
     wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
             console.log(data);
-
             client.send(JSON.stringify(data));
         }
     })
 };
 
-let sensorOptions = [];
-let sensors = new Map();
 
-//Load TFSensorOptions out of file
-fs.readFile('TFSensorOptions.json', 'utf8', function readFileCallback(err, data) {
-    if (err) {
-        console.log(err);
-    } else {
-        sensorOptions = JSON.parse(data);
-    }
-});
-
-
-
-
-for (var opts in sensorOptions) {
-    let sensor = new TFSensor(sensorOptions[opts]);
-
-    sensor.onactivate = event => console.log('activated');
-    sensor.onchange = event => {
-        console.log(
-            `${new Date(event.reading.timestamp).toLocaleTimeString()} ${event.reading.tfValue}`);
-        let sensorResponse = {
-            id: sensor.id,
-            type: sensor.Type,
-            reading: event.reading.tfValue,
-            timestamp: event.reading.timestamp
-        };
-
-        wss.broadcast(sensorResponse);
-
-
-        sensor.reading = event.reading
-    }
-    sensor.start();
-    // setTimeout(
-    //     () => {
-    //         sensor.stop();
-    //     },
-    //     5000
-    // );
-    // sensor.onchange = event => sensor.reading = event.reading;
-    sensors.set(sensor.id, sensor);
-}
-
-Array
-    .from(sensors.entries())
-    .forEach(entry => entry[1].start());
-
-let sensorsResponse = Array
-    .from(sensors.keys())
-    .map(id => ({
-        id: id
-    }));
 
 //Operations for all Sensors (GET LIST, POST NEW SENSOR)
 module.exports = class Sensors {
-    static sensors(request, response, next) {
+
+    constructor(TypeHardwareSensor, TypePhoneSensor) {
+        this._typeHardwareSensor = TypeHardwareSensor;
+        this._typePhoneSensor = TypePhoneSensor;
+
+        this._sensorOptions = [];
+        this._sensors = new Map();
+
+        //Load TFSensorOptions out of file
+        fs.readFile('TFSensorOptions.json', 'utf8', function readFileCallback(err, data) {
+            if (err) {
+                console.log(err);
+            } else {
+                this._sensorOptions = JSON.parse(data);
+            }
+        });
+
+        for (var opts in this._sensorOptions) {
+            let sensor = new _typeHardwareSensor(this._sensorOptions[opts]);
+
+            sensor.onactivate = event => console.log('activated');
+            sensor.onchange = event => {
+                console.log(
+                    `${new Date(event.reading.timestamp).toLocaleTimeString()} ${event.reading.tfValue}`);
+                let sensorResponse = {
+                    id: sensor.id,
+                    type: sensor.Type,
+                    reading: event.reading.tfValue,
+                    timestamp: event.reading.timestamp
+                };
+
+                wss.broadcast(sensorResponse);
+
+                sensor.reading = event.reading
+            }
+            sensor.start();
+            this._sensors.set(sensor.id, sensor);
+        }
+
+        // Array
+        //     .from(this._sensors.entries())
+        //     .forEach(entry => entry[1].start());
+
+        // let sensorsResponse = Array
+        //     .from(this._sensors.keys())
+        //     .map(id => ({
+        //         id: id
+        //     }));
+
+
+    }
+
+
+    sensors(request, response, next) {
+        let sensorsResponse;
+
         switch (request.method) {
             case "GET":
                 sensorsResponse = Array
-                    .from(sensors.keys())
+                    .from(this._sensors.keys())
                     .map(id => ({
                         id: id
                     }));
@@ -106,24 +109,23 @@ module.exports = class Sensors {
                 let sensor;
 
                 if (request.body.target === 'Tinkerforge') {
-                    sensor = new TFSensor(request.body);
-                    sensorOptions.push(request.body);
-                    var json = JSON.stringify(sensorOptions);
-                     fs.writeFile('TFSensorOptions.json', json, 'utf8', ()=>console.log("Writing successful!"));
+                    sensor = new _typeHardwareSensor(request.body);
+                    this._sensorOptions.push(request.body);
+                    var json = JSON.stringify(this._sensorOptions);
+                    fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
 
 
                 } else {
-                    sensor = new PhoneSensor(request.body);
+                    sensor = new _typePhoneSensor(request.body);
                 }
 
-                if(request.body.active == true)
-                {
+                if (request.body.active == true) {
                     sensor.start();
                 }
 
-                sensors.set(sensor.id, sensor);
+                this._sensors.set(sensor.id, sensor);
                 sensorsResponse = Array
-                    .from(sensors.keys())
+                    .from(this._sensors.keys())
                     .map(id => ({
                         id: id
                     }));
@@ -150,10 +152,9 @@ module.exports = class Sensors {
         }
     }
 
-//Single Sensor need ID (GET[ID;TYPE;FREQUENCY], PUT[UPDATE SENSOR])
-    static sensor(request, response, next) {
-        let sensor = sensors.get(request.params.sensor);
-
+    //Single Sensor need ID (GET[ID;TYPE;FREQUENCY], PUT[UPDATE SENSOR])
+    sensor(request, response, next) {
+        let sensor = this._sensors.get(request.params.sensor);
         let sensorResponse = {
             id: sensor.id,
             type: sensor.Type,
@@ -183,45 +184,43 @@ module.exports = class Sensors {
                 break;
             case "DELETE":
                 if (sensor.target === 'Tinkerforge') {
-                    sensorOptions = sensorOptions.filter(i=> i.UID!=sensor.id)
-                    var json = JSON.stringify(sensorOptions);
-                     fs.writeFile('TFSensorOptions.json', json, 'utf8', ()=>console.log("Writing successful!"));
+                    this._sensorOptions = this._sensorOptions.filter(i => i.UID != sensor.id)
+                    var json = JSON.stringify(this._sensorOptions);
+                    fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
                 }
 
-                sensors.delete(sensor.id);
+                this._sensors.delete(sensor.id);
 
             case "PUT":
                 sensor.stop();
 
-                if(request.body.target != sensor.target )
-                {
-                  //Not allowed
-                  break;
+                if (request.body.target != sensor.target) {
+                    //Not allowed
+                    break;
                 }
 
-                sensors.delete(sensor.id);
+                this._sensors.delete(sensor.id);
 
                 if (request.body.target === 'Tinkerforge') {
 
-                    sensorOptions = sensorOptions.filter(i=> i.UID!=sensor.id)
-                    sensor = new TFSensor(request.body);
-                    sensorOptions.push(request.body);
-                    var json = JSON.stringify(sensorOptions);
-                     fs.writeFile('TFSensorOptions.json', json, 'utf8', ()=>console.log("Writing successful!"));
+                    this._sensorOptions = this._sensorOptions.filter(i => i.UID != sensor.id)
+                    sensor = new _typeHardwareSensor(request.body);
+                    this._sensorOptions.push(request.body);
+                    var json = JSON.stringify(this._sensorOptions);
+                    fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
 
 
                 } else {
-                    sensor = new PhoneSensor(request.body);
+                    sensor = new _typePhoneSensor(request.body);
                 }
 
-                if(request.body.active == true)
-                {
+                if (request.body.active == true) {
                     sensor.start();
                 }
 
-                sensors.set(sensor.id, sensor);
+                this._sensors.set(sensor.id, sensor);
                 sensorsResponse = Array
-                    .from(sensors.keys())
+                    .from(this._sensors.keys())
                     .map(id => ({
                         id: id
                     }));
@@ -247,8 +246,8 @@ module.exports = class Sensors {
         }
     }
 
-    static lastSensorReading(request, response, next) {
-        let sensor = sensors.get(request.params.sensor);
+    lastSensorReading(request, response, next) {
+        let sensor = this._sensors.get(request.params.sensor);
         let sensorResponse = {
             reading: sensor.reading.value,
             timestamp: sensor.reading.timestamp
@@ -288,7 +287,7 @@ module.exports = class Sensors {
         }
     }
 
-    static _404(request, response) {
+    _404(request, response) {
         response.status(404).json({
             "error": http.STATUS_CODES[404]
         })
