@@ -88,8 +88,7 @@ module.exports = class Sensors {
         fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
     }
 
-    clearSensors()
-    {
+    clearSensors() {
         sensors = new Map();
     }
 
@@ -116,6 +115,19 @@ module.exports = class Sensors {
                 break;
             case "POST":
 
+                if (sensor.has(request.body.UID)) {
+                    response.format({
+                        "application/json": () => {
+                            response.status(409).json(
+                                {
+                                    "status": "UID already exists"
+                                });
+                        },
+                        "default": () => {
+                            next(new httpError.NotAcceptable());
+                        }
+                    });
+                }
 
                 let sensor;
 
