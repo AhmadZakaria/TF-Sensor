@@ -4,7 +4,7 @@
 module.exports = class ResponseMock {
 
     constructor() {
-        this.formatData = {}
+        this.formatData = {};
         this.responseData = {
             data: {},
             send: function (data) {
@@ -13,13 +13,10 @@ module.exports = class ResponseMock {
             json: function (data) {
                 this.data = data;
             },
-            type:function (type){
+            type: function (type) {
                 return this;
-            }
-
-
+            },
         };
-        this.HTTPCODE; { };
     }
 
     status(HTTPCODE) {
@@ -28,4 +25,6 @@ module.exports = class ResponseMock {
     }
 
     format(data) { this.formatData = data }
+
+
 }

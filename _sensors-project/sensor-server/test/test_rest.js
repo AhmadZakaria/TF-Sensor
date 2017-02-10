@@ -2,8 +2,11 @@ var assert = require('assert');
 const DummySensor = require('../../dummy-sensor/lib/DummySensor');
 const Sensors = require("../lib/routes/sensors");
 const http = require("http");
+const httpError = require("http-errors");
 const ResponseMock = require("./Mocks/ResponseMock")
 const RequestMock = require("./Mocks/RequestMock")
+const NextMock = require("./Mocks/NextMock")
+
 const TFSensorOptions = require("./Mocks/TFSensorOptions")
 
 describe('Sensor Rest Service', function () {
@@ -11,6 +14,9 @@ describe('Sensor Rest Service', function () {
         it('should return instanceof Sensors', function () {
 
             let sensors = new Sensors(DummySensor, DummySensor);
+
+            sensors.clearsensorOptions();
+            sensors.clearSensors();
 
             assert.equal(sensors instanceof Sensors, true);
         });
@@ -75,21 +81,21 @@ describe('Sensor Rest Service', function () {
             //Getting Sensor Details
             request = new RequestMock("GET");
             request.params = {
-                sensor: {
-                    id: TFSensorOptions.temperatureSensorOptions.UID,
-                    type: TFSensorOptions.temperatureSensorOptions.type,
-                    frequency: TFSensorOptions.temperatureSensorOptions.frequency
-                }
+                sensor: TFSensorOptions.temperatureSensorOptions.UID
             }
 
 
             response = new ResponseMock();
+            next = new NextMock();
 
-            sensors.sensor(request, response);
+
+
+            sensors.sensor(request, response,next.next);
+
 
             response.formatData["application/json"]();
 
-            assert.equal(response.HTTPCODE, 200);
+            assert.equal(response.responseData.data.id, TFSensorOptions.temperatureSensorOptions.UID);
 
         });
     });

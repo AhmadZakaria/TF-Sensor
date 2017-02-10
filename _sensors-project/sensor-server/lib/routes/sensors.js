@@ -19,41 +19,41 @@ const wss = new WebSocket.Server({
 wss.broadcast = function broadcast(data) {
     wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
-            console.log(data);
+            // console.log(data);
             client.send(JSON.stringify(data));
         }
     })
 };
 
+let typeHardwareSensor;
+let typePhoneSensor;
+
+let sensorOptions = [];
+let sensors = new Map();
 
 
 //Operations for all Sensors (GET LIST, POST NEW SENSOR)
 module.exports = class Sensors {
 
     constructor(TypeHardwareSensor, TypePhoneSensor) {
-        this._typeHardwareSensor = TypeHardwareSensor;
-        this._typePhoneSensor = TypePhoneSensor;
-
-        this._sensorOptions = [];
-        this._sensors = new Map();
+        typeHardwareSensor = TypeHardwareSensor;
+        typePhoneSensor = TypePhoneSensor;
 
         //Load TFSensorOptions out of file
         var content = fs.readFileSync('TFSensorOptions.json', 'utf8');
 
         if (content != "") {
-            console.log(JSON.parse(content));
-
-            this._sensorOptions = JSON.parse(content);
+            sensorOptions = JSON.parse(content);
         }
 
         //Initialise loaded sensors
-        for (var opts in this._sensorOptions) {
-            let sensor = new this._typeHardwareSensor(this._sensorOptions[opts]);
+        for (var opts in sensorOptions) {
+            let sensor = new typeHardwareSensor(sensorOptions[opts]);
 
-            sensor.onactivate = event => console.log('activated');
+            // sensor.onactivate = event => console.log('activated');
             sensor.onchange = event => {
-                console.log(
-                    `${new Date(event.reading.timestamp).toLocaleTimeString()} ${event.reading.tfValue}`);
+                // console.log(
+                //     `${new Date(event.reading.timestamp).toLocaleTimeString()} ${event.reading.tfValue}`);
                 let sensorResponse = {
                     id: sensor.id,
                     type: sensor.Type,
@@ -66,20 +66,31 @@ module.exports = class Sensors {
                 sensor.reading = event.reading
             }
             sensor.start();
-            this._sensors.set(sensor.id, sensor);
+            sensors.set(sensor.id, sensor);
         }
 
         // Array
-        //     .from(this._sensors.entries())
+        //     .from(sensors.entries())
         //     .forEach(entry => entry[1].start());
 
         // let sensorsResponse = Array
-        //     .from(this._sensors.keys())
+        //     .from(sensors.keys())
         //     .map(id => ({
         //         id: id
         //     }));
 
 
+    }
+
+    clearsensorOptions() {
+        sensorOptions = [];
+        var json = JSON.stringify(sensorOptions);
+        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
+    }
+
+    clearSensors()
+    {
+        sensors = new Map();
     }
 
 
@@ -88,7 +99,7 @@ module.exports = class Sensors {
         switch (request.method) {
             case "GET":
                 sensorsResponse = Array
-                    .from(this._sensors.keys())
+                    .from(sensors.keys())
                     .map(id => ({
                         id: id
                     }));
@@ -105,27 +116,26 @@ module.exports = class Sensors {
                 break;
             case "POST":
 
-                //toDO: POST of same UID --> abort
 
                 let sensor;
 
                 if (request.body.target === 'Tinkerforge') {
-                    sensor = new this._typeHardwareSensor(request.body);
-                    this._sensorOptions.push(request.body);
-                    var json = JSON.stringify(this._sensorOptions);
+                    sensor = new typeHardwareSensor(request.body);
+                    sensorOptions.push(request.body);
+                    var json = JSON.stringify(sensorOptions);
                     fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful (sensors POST" + sensor.id + " )!"));
 
 
                 } else {
-                    sensor = new this._typePhoneSensor(request.body);
+                    sensor = new typePhoneSensor(request.body);
                 }
 
                 if (request.body.active == true) {
                     sensor.start();
                 }
 
-                this._sensors.set(sensor.id, sensor);
-                sensorsResponse = Array.from(this._sensors.keys())
+                sensors.set(sensor.id, sensor);
+                sensorsResponse = Array.from(sensors.keys())
                     .map(id => ({
                         id: id
                     }));
@@ -154,12 +164,7 @@ module.exports = class Sensors {
 
     //Single Sensor need ID (GET[ID;TYPE;FREQUENCY], PUT[UPDATE SENSOR])
     sensor(request, response, next) {
-        let sensor = this._sensors.get(request.params.sensor.id);
-        let sensorResponse = {
-            id: sensor.id,
-            type: sensor.Type,
-            frequency: sensor.sensorOptions.frequency
-        }
+        let sensor = sensors.get(request.params.sensor);
 
         if (sensor == undefined) {
             response.format({
@@ -169,6 +174,13 @@ module.exports = class Sensors {
             });
             return;
         }
+
+        let sensorResponse = {
+            id: sensor.id,
+            type: sensor.Type,
+            frequency: sensor.sensorOptions.frequency
+        }
+
 
         switch (request.method) {
             case "GET":
@@ -183,12 +195,12 @@ module.exports = class Sensors {
                 break;
             case "DELETE":
                 if (sensor.target === 'Tinkerforge') {
-                    this._sensorOptions = this._sensorOptions.filter(i => i.UID != sensor.id)
-                    var json = JSON.stringify(this._sensorOptions);
+                    sensorOptions = sensorOptions.filter(i => i.UID != sensor.id)
+                    var json = JSON.stringify(sensorOptions);
                     fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
                 }
 
-                this._sensors.delete(sensor.id);
+                sensors.delete(sensor.id);
 
             case "PUT":
                 sensor.stop();
@@ -198,28 +210,28 @@ module.exports = class Sensors {
                     break;
                 }
 
-                this._sensors.delete(sensor.id);
+                sensors.delete(sensor.id);
 
                 if (request.body.target === 'Tinkerforge') {
 
-                    this._sensorOptions = this._sensorOptions.filter(i => i.UID != sensor.id)
-                    sensor = new this._typeHardwareSensor(request.body);
-                    this._sensorOptions.push(request.body);
-                    var json = JSON.stringify(this._sensorOptions);
+                    sensorOptions = sensorOptions.filter(i => i.UID != sensor.id)
+                    sensor = new typeHardwareSensor(request.body);
+                    sensorOptions.push(request.body);
+                    var json = JSON.stringify(sensorOptions);
                     fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
 
 
                 } else {
-                    sensor = new this._typePhoneSensor(request.body);
+                    sensor = new typePhoneSensor(request.body);
                 }
 
                 if (request.body.active == true) {
                     sensor.start();
                 }
 
-                this._sensors.set(sensor.id, sensor);
+                sensors.set(sensor.id, sensor);
                 sensorsResponse = Array
-                    .from(this._sensors.keys())
+                    .from(sensors.keys())
                     .map(id => ({
                         id: id
                     }));
@@ -246,7 +258,7 @@ module.exports = class Sensors {
     }
 
     lastSensorReading(request, response, next) {
-        let sensor = this._sensors.get(request.params.sensor);
+        let sensor = sensors.get(request.params.sensor);
         let sensorResponse = {
             reading: sensor.reading.value,
             timestamp: sensor.reading.timestamp
