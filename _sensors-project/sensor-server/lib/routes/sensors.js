@@ -114,8 +114,7 @@ module.exports = class Sensors {
                 });
                 break;
             case "POST":
-
-                if (sensor.has(request.body.UID)) {
+                if (sensors.has(request.body.UID)) {
                     response.format({
                         "application/json": () => {
                             response.status(409).json(
@@ -127,40 +126,43 @@ module.exports = class Sensors {
                             next(new httpError.NotAcceptable());
                         }
                     });
+                    break;
                 }
+                else {
 
-                let sensor;
+                    let sensor;
 
-                if (request.body.target === 'Tinkerforge') {
-                    sensor = new typeHardwareSensor(request.body);
-                    sensorOptions.push(request.body);
-                    var json = JSON.stringify(sensorOptions);
-                    fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful (sensors POST" + sensor.id + " )!"));
+                    if (request.body.target === 'Tinkerforge') {
+                        sensor = new typeHardwareSensor(request.body);
+                        sensorOptions.push(request.body);
+                        var json = JSON.stringify(sensorOptions);
+                        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful (sensors POST" + sensor.id + " )!"));
 
 
-                } else {
-                    sensor = new typePhoneSensor(request.body);
-                }
-
-                if (request.body.active == true) {
-                    sensor.start();
-                }
-
-                sensors.set(sensor.id, sensor);
-                sensorsResponse = Array.from(sensors.keys())
-                    .map(id => ({
-                        id: id
-                    }));
-
-                response.format({
-                    "application/json": () => {
-                        response.status(201).send(sensorsResponse);
-                    },
-                    "default": () => {
-                        next(new httpError.NotAcceptable());
+                    } else {
+                        sensor = new typePhoneSensor(request.body);
                     }
-                });
-                break;
+
+                    if (request.body.active == true) {
+                        sensor.start();
+                    }
+
+                    sensors.set(sensor.id, sensor);
+                    sensorsResponse = Array.from(sensors.keys())
+                        .map(id => ({
+                            id: id
+                        }));
+
+                    response.format({
+                        "application/json": () => {
+                            response.status(201).send(sensorsResponse);
+                        },
+                        "default": () => {
+                            next(new httpError.NotAcceptable());
+                        }
+                    });
+                    break;
+                }
             case "CONNECT":
             case "DELETE":
             case "HEAD":
