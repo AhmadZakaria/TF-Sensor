@@ -12,7 +12,7 @@ module.exports = class APIRouter extends require("express").Router {
     constructor(opts) {
         super(opts || APIRouter.defaultOptions());
 
-        this._sensors = new Sensors(DummySensor,DummySensor);
+        this._sensors = new Sensors(DummySensor,DummySensor); //Mocked to use DummySensor :-) for testing at home
 
         this.all("/sensors/:sensor/sensorReadings/latest", DefaultRouter.xPoweredBy,
             parser.json({
