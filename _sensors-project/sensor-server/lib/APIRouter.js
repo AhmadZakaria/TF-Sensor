@@ -19,6 +19,11 @@ module.exports = class APIRouter extends require("express").Router {
                 "inflate": true,
                 "strict": true
             }), this._sensors.lastSensorReading);
+        this.all("/sensors/:sensor/sensorOptions/active", DefaultRouter.xPoweredBy,
+            parser.json({
+                "inflate": true,
+                "strict": true
+            }), this._sensors.sensorOptionsActive);
         this.all("/sensors/:sensor", DefaultRouter.xPoweredBy,
             parser.json({
                 "inflate": true,

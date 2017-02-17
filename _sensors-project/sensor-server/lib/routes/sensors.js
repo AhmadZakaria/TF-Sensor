@@ -170,7 +170,7 @@ module.exports = class Sensors {
             case "PUT":
             case "TRACE":
             default:
-                response.set("allow", "GET");
+                response.set("allow", "GET,POST");
                 next(new httpError.MethodNotAllowed());
                 break;
         }
@@ -220,7 +220,7 @@ module.exports = class Sensors {
                 sensor.stop();
 
                 if (request.body.target != sensor.target) {
-                    //Not allowed
+                    //Not allowed DoTo Status
                     break;
                 }
 
@@ -233,7 +233,6 @@ module.exports = class Sensors {
                     sensorOptions.push(request.body);
                     var json = JSON.stringify(sensorOptions);
                     fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
-
 
                 } else {
                     sensor = new typePhoneSensor(request.body);
@@ -265,7 +264,7 @@ module.exports = class Sensors {
             case "POST":
             case "TRACE":
             default:
-                response.set("allow", "GET, PUT");
+                response.set("allow", "GET, PUT, DELETE");
                 next(new httpError.MethodNotAllowed());
                 break;
         }
@@ -304,6 +303,43 @@ module.exports = class Sensors {
                     }
                 });
                 break;
+            case "TRACE":
+            default:
+                response.set("allow", "GET, POST");
+                next(new httpError.MethodNotAllowed());
+                break;
+        }
+    }
+
+     sensorOptionsActive(request, response, next) {
+        let sensor = sensors.get(request.params.sensor);
+        switch (request.method) {
+            case "GET":
+            case "DELETE":
+            case "PUT":
+             var active = parse(request.body.active);
+
+             if(active == true)
+             {
+                sensor.start();
+             }
+             else
+             {
+                sensor.stop();
+             }
+                response.format({
+                    "application/json": () => {
+                        response.status(200);
+                    },
+                    "default": () => {
+                        next(new httpError.NotAcceptable());
+                    }
+                });
+                break;
+            case "CONNECT":
+            case "HEAD":
+            case "OPTIONS":
+            case "POST":             
             case "TRACE":
             default:
                 response.set("allow", "GET, POST");
