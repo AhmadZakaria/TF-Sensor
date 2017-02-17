@@ -220,11 +220,11 @@ module.exports = class Sensors {
                 sensor.stop();
 
                 if (request.body.target != sensor.target) {
-                    //Not allowed DoTo Status
+                    //Not allowed DoTo Status Message
                     break;
                 }
 
-                sensors.delete(sensor.id);
+                sensors.delete(sensor.id); //Delete because of reintiasation of the Tinkerforge
 
                 if (request.body.target === 'Tinkerforge') {
 
@@ -342,7 +342,7 @@ module.exports = class Sensors {
             case "POST":             
             case "TRACE":
             default:
-                response.set("allow", "GET, POST");
+                response.set("allow", "PUT");
                 next(new httpError.MethodNotAllowed());
                 break;
         }
