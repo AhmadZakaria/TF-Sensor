@@ -10,7 +10,7 @@ var TFSensorOptions = {
         //sensor measurement normalization factor
         normFact: 100.0,
         //sensor callback event type
-        callbackEvent: BrickletTemperature.CALLBACK_TEMPERATURE,
+        callbackEvent: CALLBACK_TEMPERATURE,
         //sensor callback period function type
         frequency: 500,
         // periodic callback function name
@@ -22,7 +22,8 @@ var TFSensorOptions = {
         //
         target: 'Tinkerforge',
         //
-        active: true
+        active: true,
+        unit: "°C"
     },
 
     ambientLightSensorOptions: {
@@ -32,7 +33,7 @@ var TFSensorOptions = {
         //sensor measurement normalization factor
         normFact: 100.0,
         //sensor callback event type
-        callbackEvent: BrickletAmbientLightV2.CALLBACK_ILLUMINANCE,
+        callbackEvent: CALLBACK_ILLUMINANCE,
         //sensor callback period function type
         frequency: 500,
         // callback function name
@@ -40,7 +41,8 @@ var TFSensorOptions = {
         // direct get measurement function name
         simpleFunc: 'getIlluminance',
         // sensor UID
-        UID: 'yih'
+        UID: 'yih',
+        unit: "lux"
     },
 
     humiditySensorOptions: {
@@ -50,7 +52,7 @@ var TFSensorOptions = {
         //sensor measurement normalization factor
         normFact: 10.0,
         //sensor callback event type
-        callbackEvent: BrickletHumidity.CALLBACK_HUMIDITY,
+        callbackEvent: CALLBACK_HUMIDITY,
         //sensor callback period function type
         frequency: 500,
         // callback function name
@@ -58,7 +60,9 @@ var TFSensorOptions = {
         // direct get measurement function name
         simpleFunc: 'getHumidity',
         // sensor UID
-        UID: 'xDM'
+        UID: 'xDM',
+        unit: "%"
+
     },
     soundSensorOptions: {
         type: "Sound Intensity Sensor",
@@ -67,7 +71,7 @@ var TFSensorOptions = {
         //sensor measurement normalization factor
         normFact: 1.0,
         //sensor callback event type
-        callbackEvent: BrickletSoundIntensity.CALLBACK_INTENSITY,
+        callbackEvent: CALLBACK_INTENSITY,
         //sensor callback period function type
         frequency: 500,
         // callback function name
@@ -75,7 +79,8 @@ var TFSensorOptions = {
         // direct get measurement function name
         simpleFunc: 'getIntensity',
         // sensor UID
-        UID: 'vqY'
+        UID: 'vqY',
+        unit: "W/m^2"
     }
 
 };

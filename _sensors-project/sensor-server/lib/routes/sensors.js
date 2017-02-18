@@ -53,7 +53,7 @@ module.exports = class Sensors {
             // sensor.onactivate = event => console.log('activated');
             sensor.onchange = event => {
                 // console.log(
-                    // `${new Date(event.reading.timestamp).toLocaleTimeString()} ${event.reading.tfValue}`);
+                // `${new Date(event.reading.timestamp).toLocaleTimeString()} ${event.reading.tfValue}`);
                 let sensorResponse = {
                     id: sensor.id,
                     type: sensor.Type,
@@ -312,35 +312,38 @@ module.exports = class Sensors {
         }
     }
 
-     sensorOptionsActive(request, response, next) {
+    sensorOptionsActive(request, response, next) {
         let sensor = sensors.get(request.params.sensor);
         switch (request.method) {
             case "GET":
             case "DELETE":
             case "PUT":
-             var active = parse(request.body.active);
-
-             if(active == true)
-             {
-                sensor.start();
-             }
-             else
-             {
-                sensor.stop();
-             }
-                response.format({
-                    "application/json": () => {
-                        response.status(200);
-                    },
-                    "default": () => {
-                        next(new httpError.NotAcceptable());
+                let active = parse(request.body.active);
+                if (typeof (active) === "boolean") { // good request
+                    if (active == true) {
+                        sensor.start();
                     }
-                });
+                    else {
+                        sensor.stop();
+                    }
+                    response.format({
+                        "application/json": () => {
+                            response.status(200);
+                        },
+                        "default": () => {
+                            next(new httpError.NotAcceptable());
+                        }
+                    });
+                } else {// bad request
+                    next(new httpError.BadRequest());
+                }
+
+
                 break;
             case "CONNECT":
             case "HEAD":
             case "OPTIONS":
-            case "POST":             
+            case "POST":
             case "TRACE":
             default:
                 response.set("allow", "PUT");
