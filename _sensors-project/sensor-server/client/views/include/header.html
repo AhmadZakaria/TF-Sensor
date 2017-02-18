@@ -122,34 +122,29 @@
             var clone = document.importNode(t.content, true);
             // Populate the src at runtime.
             clone.querySelector('#sensor_i_gauge').id = gaugeID;
-            clone.querySelector('#sensorName').textContent = _type + "(" + _id + ")";
+            clone.querySelector('#sensorName').textContent = _type;
             clone.querySelector('#sensorID').textContent = _id;
             clone.querySelector('#sensor_x_history').id = historyID;
             document.querySelector('#sensorsContainer').appendChild(clone);
 
             // prepare data
             let label = undefined;
-            let label_unit = undefined;
+            let label_unit = sensorResponse.unit;
             switch (sensorResponse.type) {
                 case 'Temperature Sensor':
                     label = "Temperature";
-                    label_unit = 'Temperature (Celcius)'
                     break;
                 case 'Ambient Sensor':
                     label = "Light";
-                    label_unit = 'Illuminance (Lux)'
                     break;
                 case 'Humidity Sensor':
                     label = "Humidity";
-                    label_unit = 'Humidity (%)'
                     break;
                 case 'Sound Intensity Sensor':
                     label = "Sound";
-                    label_unit = 'Sound (db)'
                     break;
                 case 'Accelerometer Sensor':
                     label = "Accelerometer";
-                    label_unit = 'Acceleration (m/(s^2))'
                     break;
                 default:
                     label = "Unknown ";
@@ -220,20 +215,21 @@
             if (lockMap.get(data.id)) {//check if the chart is ready
                 let now = new Date();
                 let newData = dataMap.get(data.id).
-                    filter(i => (now - i[0]) < 10000).
+                    filter(i => (now - i[0]) < 20000).
                     map(i => [-1 * (now - i[0]) / 1000, i[1]]);
                 // newData.unshift(["Timestamp", "Units"]);
 
                 let data1 = new google.visualization.DataTable();
                 data1.addColumn('number', 'Seconds ago');
-                data1.addColumn('number', 'Units');
+                data1.addColumn('number', data.unit);
                 data1.addRows(newData);
 
                 var formatter = new google.visualization.NumberFormat({ suffix: ' secs' });
-                formatter.format(data1, 0); // Apply formatter to second column
+                var unitFormatter = new google.visualization.NumberFormat({ suffix: data.unit });
+                formatter.format(data1, 0); // Apply formatter to first column
+                unitFormatter.format(data1, 1); // Apply formatter to second column
 
-                options_line.hAxis = { title: 'Seconds' };
-                options_line.vAxis = { title: 'Units' };
+                options_line.vAxis = { title: data.unit };
 
                 let g_chart = gaugeChartMap.get(data.id);
                 let l_chart = lineChartMap.get(data.id);
