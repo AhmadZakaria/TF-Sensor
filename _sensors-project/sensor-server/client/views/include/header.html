@@ -28,14 +28,22 @@
 
         let options_line = {
             legend: 'none',
-            // curveType: 'function',
             hAxis: {
+                title: 'Time',
                 maxValue: 0,
-                minValue: -10,
-                viewWindowMode: 'maximized',
-                // reverseCategories: true,
-                gridlines: { count: 10 }
+                minValue: -20,
+                viewWindowMode: 'explicit',
+                gridlines: { count: 10 },
+                viewWindow: {
+                    min: -20,
+                    max: 0
+                },
 
+                ticks: [{ v: 0, f: 'Now' },
+                { v: -5, f: '5' },
+                { v: -10, f: '10 seconds ago' },
+                { v: -15, f: '15' },
+                { v: -20, f: '20 seconds ago' }]
             },
             // {
             //     "position": "top",
@@ -50,12 +58,50 @@
         };
 
         var options_gauge = {
-            // width: 600, height: 520,
-            redFrom: 90,
+            yih: {
+                redFrom: 170,
+                redTo: 200,
+                yellowFrom: 150,
+                yellowTo: 170,
+                greenFrom: 0,
+                greenTo: 150,
+                minorTicks: 5,
+                min: 0,
+                max: 200
+            },
+            vqY: {
+                redFrom: 3000,
+                redTo: 4095,
+                yellowFrom: 2000,
+                yellowTo: 3000,
+                greenFrom: 0,
+                greenTo: 2000,
+                minorTicks: 5,
+                min: 0,
+                max: 4095
+            },
+            xDM: {
+                redFrom: 70,
             redTo: 100,
-            yellowFrom: 75,
-            yellowTo: 90,
-            minorTicks: 5
+                yellowFrom: 40,
+                yellowTo: 70,
+                greenFrom: 0,
+                greenTo: 40,
+                minorTicks: 5,
+                min: 0,
+                max: 100
+            },
+            tkw: {
+                redFrom: 35,
+                redTo: 50,
+                yellowFrom: 27,
+                yellowTo: 35,
+                greenFrom: 15,
+                greenTo: 27,
+                minorTicks: 5,
+                min: 0,
+                max: 50
+            }
         };
 
 
@@ -133,7 +179,7 @@
             google.visualization.events.addListener(linechart, 'ready', () => lockMap.set(_id, true));
 
 
-            gaugechart.draw(data_line, options_gauge);
+            gaugechart.draw(data_line, options_gauge[_id]);
 
         }
 
@@ -191,7 +237,7 @@
 
                 let g_chart = gaugeChartMap.get(data.id);
                 let l_chart = lineChartMap.get(data.id);
-                g_chart.draw(gaugeDataMap.get(data.id), options_gauge);
+                g_chart.draw(gaugeDataMap.get(data.id), options_gauge[data.id]);
                 l_chart.draw(data1, options_line);
             }
         }
