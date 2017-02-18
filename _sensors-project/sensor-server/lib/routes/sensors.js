@@ -3,8 +3,8 @@
 const uuid = require("uuid");
 const httpError = require("http-errors");
 const http = require("http");
-// const TFSensor = require('../../../tf-sensor/lib/TFSensor');
-// const PhoneSensor = require('../../../phone-sensor/lib/PhoneSensor');
+const TFSensor = require('../../../tf-sensor/lib/TFSensor');
+const PhoneSensor = require('../../../phone-sensor/lib/PhoneSensor');
 const WebSocket = require('ws');
 const fs = require('fs');
 
@@ -53,17 +53,17 @@ module.exports = class Sensors {
             // sensor.onactivate = event => console.log('activated');
             sensor.onchange = event => {
                 // console.log(
-                //     `${new Date(event.reading.timestamp).toLocaleTimeString()} ${event.reading.tfValue}`);
+                    // `${new Date(event.reading.timestamp).toLocaleTimeString()} ${event.reading.tfValue}`);
                 let sensorResponse = {
                     id: sensor.id,
                     type: sensor.Type,
-                    reading: event.reading.tfValue,
+                    reading: event.reading.value,
                     timestamp: event.reading.timestamp
                 };
 
                 wss.broadcast(sensorResponse);
 
-                sensor.reading = event.reading
+                sensor.reading = event.reading;
             }
             sensor.start();
             sensors.set(sensor.id, sensor);
