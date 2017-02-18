@@ -60,6 +60,8 @@ process.on("uncaughtException", function (error)
 {
     debug(error.message);
     debug(error.stack);
+    console.log(error.message);
+    console.log(error.stack);
     process.exit(1);
 });
 
