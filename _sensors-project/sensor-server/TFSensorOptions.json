@@ -9,7 +9,8 @@
         "simpleFunc": "getTemperature",
         "UID": "tkw",
         "target": "Tinkerforge",
-        "active": "true"
+        "active": "true",
+        "unit": "°C"
     },
     {
         "type": "Ambient Sensor",
@@ -21,7 +22,8 @@
         "simpleFunc": "getIlluminance",
         "UID": "yih",
         "target": "Tinkerforge",
-        "active": "true"
+        "active": "true",
+        "unit": "lux"
     },
     {
         "type": "Sound Intensity Sensor",
@@ -33,7 +35,8 @@
         "simpleFunc": "getIntensity",
         "UID": "vqY",
         "target": "Tinkerforge",
-        "active": "true"
+        "active": "true",
+        "unit": "W/m^2"
     },
     {
         "type": "Humidity Sensor",
@@ -45,6 +48,7 @@
         "simpleFunc": "getHumidity",
         "UID": "xDM",
         "target": "Tinkerforge",
-        "active": "true"
+        "active": "true",
+        "unit": "%"
     }
 ]

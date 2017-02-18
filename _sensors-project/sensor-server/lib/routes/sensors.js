@@ -58,7 +58,8 @@ module.exports = class Sensors {
                     id: sensor.id,
                     type: sensor.Type,
                     reading: event.reading.value,
-                    timestamp: event.reading.timestamp
+                    timestamp: event.reading.timestamp,
+                    unit: event.unit
                 };
 
                 wss.broadcast(sensorResponse);
