@@ -5,7 +5,7 @@ const client = dgram.createSocket("udp4");
 const port = 9200;
 const message = Buffer.from("Hi datagram server!");
 
-client.send(message, port, "localhost", (err) => {
+client.send(message, port, "0.0.0.0", (err) => {
     if(err)
     {
         console.error(`client error: ${err.message}`);

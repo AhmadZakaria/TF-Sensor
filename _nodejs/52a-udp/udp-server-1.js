@@ -26,6 +26,6 @@ server.on("listening", () => {
     const address = server.address();
     console.log(`server listening on ${address.address}:${address.port}`);
 });
-server.bind(port, "localhost", () => {
+server.bind(port, "0.0.0.0", () => {
     console.log(`server bound to port: ${port}`);
 });
