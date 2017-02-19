@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      SensorApp
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-card>
+    <ion-card-content>
+            <div class="item item-divider">
+                Device Motion information!
+            </div>
+            <div class="item item-text-wrap">
+                <ul class="list">
+                    <li class="item">
+                        X = {{acc}}
+                    </li>
+              </ul>
+            </div>
+      <button ion-button color="dark" (click)="registerPonySensor($event)">Register Sensor</button>
+      <button ion-button color="blue" (click)="clickedAlert($event)">Toggle Sensor</button>
+
+              </ion-card-content>
+   </ion-card>
+
+  <img src="{{img_pony}}" style = "border : solid transparent;width:70%;height:70%;" class="center" alt=""/>
+
+</ion-content>
