@@ -59,12 +59,12 @@ module.exports = class Sensors {
                     type: sensor.Type,
                     reading: event.reading.value,
                     timestamp: event.reading.timestamp,
-                    unit: event.unit
+                    unit: sensor.unit
                 };
 
                 wss.broadcast(sensorResponse);
 
-                sensor.reading = event.reading;
+                sensor.lastReading = event.reading;
             }
             sensor.start();
             sensors.set(sensor.id, sensor);
@@ -86,7 +86,9 @@ module.exports = class Sensors {
     clearsensorOptions() {
         sensorOptions = [];
         var json = JSON.stringify(sensorOptions);
-        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
+                        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
+                            //console.log("Writing successful (sensors POST" + sensor.id + " )!");
+                        });
     }
 
     clearSensors() {
@@ -137,11 +139,25 @@ module.exports = class Sensors {
                         sensor = new typeHardwareSensor(request.body);
                         sensorOptions.push(request.body);
                         var json = JSON.stringify(sensorOptions);
-                        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful (sensors POST" + sensor.id + " )!"));
+                        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
+                            //console.log("Writing successful (sensors POST" + sensor.id + " )!");
+                        });
 
 
                     } else {
                         sensor = new typePhoneSensor(request.body);
+                        sensor.onchange = event => {
+                            let sensorResponse = {
+                                id: sensor.id,
+                                type: sensor.Type,
+                                reading: event.reading.value,
+                                timestamp: event.reading.timestamp,
+                                unit: sensor.unit
+                            };
+
+                            wss.broadcast(sensorResponse);
+                            sensor.lastReading = event.reading;
+                        };
                     }
 
                     if (request.body.active == true) {
@@ -212,7 +228,9 @@ module.exports = class Sensors {
                 if (sensor.target === 'Tinkerforge') {
                     sensorOptions = sensorOptions.filter(i => i.UID != sensor.id)
                     var json = JSON.stringify(sensorOptions);
-                    fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
+                        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
+                            //console.log("Writing successful (sensors POST" + sensor.id + " )!");
+                        });
                 }
 
                 sensors.delete(sensor.id);
@@ -233,10 +251,24 @@ module.exports = class Sensors {
                     sensor = new typeHardwareSensor(request.body);
                     sensorOptions.push(request.body);
                     var json = JSON.stringify(sensorOptions);
-                    fs.writeFile('TFSensorOptions.json', json, 'utf8', () => console.log("Writing successful!"));
+                        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
+                            //console.log("Writing successful (sensors POST" + sensor.id + " )!");
+                        });
 
                 } else {
                     sensor = new typePhoneSensor(request.body);
+                    sensor.onchange = event => {
+                        let sensorResponse = {
+                            id: sensor.id,
+                            type: sensor.Type,
+                            reading: event.reading.value,
+                            timestamp: event.reading.timestamp,
+                            unit: sensor.unit
+                        };
+
+                        wss.broadcast(sensorResponse);
+                        sensor.lastReading = event.reading;
+                    };
                 }
 
                 if (request.body.active == true) {
@@ -273,9 +305,21 @@ module.exports = class Sensors {
 
     lastSensorReading(request, response, next) {
         let sensor = sensors.get(request.params.sensor);
+        if (sensor == undefined) {
+            response.format({
+                "application/json": () => {
+                    response.status(404).type("application/json").send("Sensor doesn't exist!");
+                },
+                "default": () => {
+                    next(new httpError.NotAcceptable());
+                }
+            });
+            return;
+        }
+        // console.log(JSON.stringify(sensor));
         let sensorResponse = {
-            reading: sensor.reading.value,
-            timestamp: sensor.reading.timestamp
+            reading: sensor.lastReading.value,
+            timestamp: sensor.lastReading.timestamp
         }
         switch (request.method) {
             case "GET":
@@ -294,7 +338,15 @@ module.exports = class Sensors {
             case "HEAD":
             case "OPTIONS":
             case "POST":
-                sensor.lastReading = parseInt(request.body.lastReading);
+                sensor.lastReading.value = parseInt(request.body.lastReading.value);
+                sensor.lastReading.timestamp = parseInt(request.body.lastReading.timestamp);
+                sensorResponse = {
+                    reading: {
+                        value: sensor.lastReading.value,
+                        timestamp: sensor.lastReading.timestamp
+                    }
+                }
+                sensor.onchange(sensorResponse);
                 response.format({
                     "application/json": () => {
                         response.status(201).send(sensorResponse);

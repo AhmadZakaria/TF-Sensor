@@ -4,7 +4,7 @@ const Sensor = require('../../generic-sensor-api').Sensor;
 const TFSensorReading = require('./TFSensorReading');
 const Tinkerforge = require('tinkerforge');
 
-const HOST = 'localhost';
+const HOST = '0.0.0.0';
 const PORT = 4223;
 
 module.exports = class TFSensor extends Sensor {
@@ -13,11 +13,12 @@ module.exports = class TFSensor extends Sensor {
         super(sensorOptions);
         this._intervalHandle = null;
         this.ipcon = new Tinkerforge.IPConnection(); // Create IP connection
-        this.lastReading = null;
+        this.lastReading = { timestamp: null, value: null };
         this.lastReadingTime = null;
         this.lastBroadcastTime = null;
         this._target = this.sensorOptions.target;
         this._type = this.sensorOptions.type;
+        this._unit = this.sensorOptions.unit;
         this._id = this.sensorOptions.UID;
         this.sen = new Tinkerforge[sensorOptions.ctor](this.sensorOptions.UID, this.ipcon); // Create device object
         this.sen.on(Tinkerforge[sensorOptions.ctor][sensorOptions.callbackEvent],

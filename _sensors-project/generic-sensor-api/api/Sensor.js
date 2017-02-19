@@ -60,6 +60,13 @@ module.exports = class Sensor {
   get Type() {
     return this._type;
   }
+  set unit(value) {
+    this._unit = value;
+  }
+  get unit() {
+    return this._unit;
+  }
+  
   set onchange(value) {
     this._onchange = value;
   }
