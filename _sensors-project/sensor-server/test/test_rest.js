@@ -97,6 +97,22 @@ describe('Sensor Rest Service', function () {
             assert.equal(response.HTTPCODE, 200);
         });
 
+        let phoneReadingPost = {
+            "type": "Accelerometer",
+            "frequency": "500",
+            "UID": "androidXYZ",
+            "target": "android",
+            "active": "true",
+            "lastReading": {
+                "value": "60",
+                "timestamp": "1487535337000"
+            }
+        };
+
+        nowTime = Date.now();
+        phoneReadingPost.lastReading.timestamp = nowTime;
+
+
         it('SEND readings from phone sensor', function () {
 
             let sensors = new Sensors(DummySensor, PhoneSensor);
@@ -108,26 +124,17 @@ describe('Sensor Rest Service', function () {
 
             sensors.sensors(request, response);
 
-            let phoneReadingPost = {
-                "type": "Accelerometer",
-                "frequency": "500",
-                "UID": "androidXYZ",
-                "target": "android",
-                "active": "true",
-                "lastReading": {
-                    "value": "60",
-                    "timestamp": "1487535337000"
-                }
-            };
 
-            nowTime = Date.now();
-            phoneReadingPost.lastReading.timestamp = nowTime;
             request.body = phoneReadingPost;
             request.params.sensor = phoneReadingPost.UID;
             sensors.lastSensorReading(request, response);
             response.formatData["application/json"]();
 
             assert.equal(response.HTTPCODE, 201);
+        });
+
+        it('GET last reading from phone sensor', function () {
+            let sensors = new Sensors(DummySensor, PhoneSensor);
 
             request = new RequestMock("GET");
             request.params.sensor = phoneReadingPost.UID;
@@ -144,6 +151,7 @@ describe('Sensor Rest Service', function () {
             assert.equal(response.HTTPCODE, 200);
         });
     });
+    
     describe('Sensor', function () {
         it('GET 1 sensor', function () {
             let sensors = new Sensors(DummySensor, DummySensor);
