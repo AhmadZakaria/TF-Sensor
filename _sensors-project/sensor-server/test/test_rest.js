@@ -1,4 +1,4 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 const DummySensor = require('../../dummy-sensor/lib/DummySensor');
 const Sensors = require("../lib/routes/sensors");
 const http = require("http");
@@ -74,56 +74,75 @@ describe('Sensor Rest Service', function () {
             assert.equal(response.HTTPCODE, 200);
         });
 
-        // it('TEST phone sensor POST', function () {
+        it('CREATE phone sensor', function () {
 
-        //     let sensors = new Sensors(DummySensor, PhoneSensor);
+            let sensors = new Sensors(DummySensor, PhoneSensor);
 
-        //     var request = new RequestMock("POST");
-        //     request.body = TFSensorOptions.phoneSensorOptions;
+            var request = new RequestMock("POST");
+            request.body = TFSensorOptions.phoneSensorOptions;
 
-        //     var response = new ResponseMock();
+            var response = new ResponseMock();
+            sensors.sensors(request, response);
 
-        //     sensors.sensors(request, response);
+            response.formatData["application/json"]();
+            assert.equal(response.HTTPCODE, 201);
 
-        //     let phoneReadingPost = {
-        //         "type": "Accelerometer",
-        //         "frequency": "500",
-        //         "UID": "androidXYZ",
-        //         "target": "android",
-        //         "active": "true",
-        //         "lastReading": {
-        //             "value": "60",
-        //             "timestamp": "1487535337000"
-        //         }
-        //     };
+            request = new RequestMock("GET");
+            response = new ResponseMock();
 
-        //     for (let i = 0; i < 20; i++) {
-        //         setTimeout(() => {
-        //             phoneReadingPost.lastReading.timestamp = Date.now();
-        //             request.body = phoneReadingPost;
-        //             sensors.sensors(request, response);
-        //             assert.equal(response.HTTPCODE, 201);
+            sensors.sensors(request, response);
+            response.formatData["application/json"]();
 
-        //         }, i * 500);
-        //     }
-        //     request = new RequestMock("GET");
-        //     request.params = {
-        //         sensor: "androidXYZ"
-        //     }
+            assert.equal(response.responseData.data["sensors"].filter(i => i.id == TFSensorOptions.phoneSensorOptions.UID).length, 1);
+            assert.equal(response.HTTPCODE, 200);
+        });
 
-        //     console.log(response.responseData);
+        it('SEND readings from phone sensor', function () {
 
-        //     request = new RequestMock("GET");
-        //     response = new ResponseMock();
+            let sensors = new Sensors(DummySensor, PhoneSensor);
 
+            var request = new RequestMock("POST");
+            request.body = TFSensorOptions.phoneSensorOptions;
 
-        //     sensors.sensors(request, response);
+            var response = new ResponseMock();
 
-        //     response.formatData["application/json"]();
+            sensors.sensors(request, response);
 
-        //     assert.equal(response.responseData.data["sensors"].length, 3);
-        //     assert.equal(response.HTTPCODE, 200);
-        // });
+            let phoneReadingPost = {
+                "type": "Accelerometer",
+                "frequency": "500",
+                "UID": "androidXYZ",
+                "target": "android",
+                "active": "true",
+                "lastReading": {
+                    "value": "60",
+                    "timestamp": "1487535337000"
+                }
+            };
+
+            nowTime = Date.now();
+            phoneReadingPost.lastReading.timestamp = nowTime;
+            request.body = phoneReadingPost;
+            request.params.sensor = phoneReadingPost.UID;
+            sensors.lastSensorReading(request, response);
+            response.formatData["application/json"]();
+
+            assert.equal(response.HTTPCODE, 201);
+
+            request = new RequestMock("GET");
+            request.params.sensor = phoneReadingPost.UID;
+            response = new ResponseMock();
+
+            sensors.lastSensorReading(request, response);
+
+            response.formatData["application/json"]();
+            responseSensor = response.responseData.data;
+
+            assert.isDefined(responseSensor, "has response");
+            assert.equal(responseSensor.reading, phoneReadingPost.lastReading.value, "reading matches last reading sent");
+            assert.equal(responseSensor.timestamp, phoneReadingPost.lastReading.timestamp, "timestamp matches last timestamp sent");
+            assert.equal(response.HTTPCODE, 200);
+        });
     });
     describe('Sensor', function () {
         it('GET 1 sensor', function () {

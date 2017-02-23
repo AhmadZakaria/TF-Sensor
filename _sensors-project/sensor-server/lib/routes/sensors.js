@@ -308,7 +308,7 @@ module.exports = class Sensors {
         if (sensor == undefined) {
             response.format({
                 "application/json": () => {
-                    response.status(404).type("application/json").send("Sensor doesn't exist!");
+                    response.status(404).type("application/json").send({"error": "Sensor doesn't exist!"});
                 },
                 "default": () => {
                     next(new httpError.NotAcceptable());
