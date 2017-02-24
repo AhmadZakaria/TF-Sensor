@@ -177,7 +177,6 @@ describe('Sensor Rest Service', function () {
             response.formatData["application/json"]();
             assert.equal(response.HTTPCODE, 200);
             assert.equal(response.responseData.data.active, false);
-
         });
 
         it('GET sensor active status', function () {
@@ -190,7 +189,6 @@ describe('Sensor Rest Service', function () {
             response.formatData["application/json"]();
             assert.equal(response.HTTPCODE, 200);
             assert.equal(response.responseData.data.active, false);
-
         });
 
 
