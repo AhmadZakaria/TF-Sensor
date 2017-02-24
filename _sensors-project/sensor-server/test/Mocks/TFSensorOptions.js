@@ -21,7 +21,7 @@ var TFSensorOptions = {
         //
         target: 'Tinkerforge',
         //
-        active: true,
+        "active": "true",
         unit: "°C"
     },
 
@@ -41,6 +41,7 @@ var TFSensorOptions = {
         simpleFunc: 'getIlluminance',
         // sensor UID
         UID: 'yih',
+        "active": "true",
         unit: "lux"
     },
 
@@ -60,6 +61,7 @@ var TFSensorOptions = {
         simpleFunc: 'getHumidity',
         // sensor UID
         UID: 'xDM',
+        "active": "true",
         unit: "%"
     },
     soundSensorOptions: {
@@ -78,6 +80,7 @@ var TFSensorOptions = {
         simpleFunc: 'getIntensity',
         // sensor UID
         UID: 'vqY',
+        "active": "true",
         unit: "W/m^2"
     },
     phoneSensorOptions: {

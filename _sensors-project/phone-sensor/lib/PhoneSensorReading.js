@@ -7,10 +7,10 @@ module.exports = class PhoneSensorReading extends SensorReading {
     this._value = value;
   }
 
-  get _value() {
+  get value() {
     return this._value;
   }
-  set _value(value) {
+  set value(value) {
     this._value = value;
   }
 }

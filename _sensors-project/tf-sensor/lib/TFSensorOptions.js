@@ -42,6 +42,7 @@ var TFSensorOptions = {
         simpleFunc: 'getIlluminance',
         // sensor UID
         UID: 'yih',
+        "active": "true",
         unit: "lux"
     },
 
@@ -61,6 +62,7 @@ var TFSensorOptions = {
         simpleFunc: 'getHumidity',
         // sensor UID
         UID: 'xDM',
+        "active": "true",
         unit: "%"
 
     },
@@ -80,6 +82,7 @@ var TFSensorOptions = {
         simpleFunc: 'getIntensity',
         // sensor UID
         UID: 'vqY',
+        "active": "true",
         unit: "W/m^2"
     }
 

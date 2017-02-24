@@ -7,6 +7,8 @@ const TFSensor = require('../../../tf-sensor/lib/TFSensor');
 const PhoneSensor = require('../../../phone-sensor/lib/PhoneSensor');
 const WebSocket = require('ws');
 const fs = require('fs');
+const SensorState = require('../../../generic-sensor-api/api/SensorState');
+
 
 //const TFSensorOptions = require('../../../tf-sensor/lib/TFSensorOptions');
 
@@ -86,9 +88,9 @@ module.exports = class Sensors {
     clearsensorOptions() {
         sensorOptions = [];
         var json = JSON.stringify(sensorOptions);
-                        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
-                            //console.log("Writing successful (sensors POST" + sensor.id + " )!");
-                        });
+        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
+            //console.log("Writing successful (sensors POST" + sensor.id + " )!");
+        });
     }
 
     clearSensors() {
@@ -228,9 +230,9 @@ module.exports = class Sensors {
                 if (sensor.target === 'Tinkerforge') {
                     sensorOptions = sensorOptions.filter(i => i.UID != sensor.id)
                     var json = JSON.stringify(sensorOptions);
-                        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
-                            //console.log("Writing successful (sensors POST" + sensor.id + " )!");
-                        });
+                    fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
+                        //console.log("Writing successful (sensors POST" + sensor.id + " )!");
+                    });
                 }
 
                 sensors.delete(sensor.id);
@@ -251,9 +253,9 @@ module.exports = class Sensors {
                     sensor = new typeHardwareSensor(request.body);
                     sensorOptions.push(request.body);
                     var json = JSON.stringify(sensorOptions);
-                        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
-                            //console.log("Writing successful (sensors POST" + sensor.id + " )!");
-                        });
+                    fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
+                        //console.log("Writing successful (sensors POST" + sensor.id + " )!");
+                    });
 
                 } else {
                     sensor = new typePhoneSensor(request.body);
@@ -308,7 +310,7 @@ module.exports = class Sensors {
         if (sensor == undefined) {
             response.format({
                 "application/json": () => {
-                    response.status(404).type("application/json").send({"error": "Sensor doesn't exist!"});
+                    response.status(404).type("application/json").send({ "error": "Sensor doesn't exist!" });
                 },
                 "default": () => {
                     next(new httpError.NotAcceptable());
@@ -366,32 +368,43 @@ module.exports = class Sensors {
 
     sensorOptionsActive(request, response, next) {
         let sensor = sensors.get(request.params.sensor);
-        switch (request.method) {
-            case "GET":
-            case "DELETE":
-            case "PUT":
-                let active = parse(request.body.active);
-                if (typeof (active) === "boolean") { // good request
-                    if (active == true) {
-                        sensor.start();
-                    }
-                    else {
-                        sensor.stop();
-                    }
-                    response.format({
-                        "application/json": () => {
-                            response.status(200);
-                        },
-                        "default": () => {
-                            next(new httpError.NotAcceptable());
-                        }
-                    });
-                } else {// bad request
-                    next(new httpError.BadRequest());
+        if (sensor == undefined) {
+            response.format({
+                "application/json": () => {
+                    response.status(404).type("application/json").send({ "error": "Sensor doesn't exist!" });
+                },
+                "default": () => {
+                    next(new httpError.NotAcceptable());
                 }
+            });
+            return;
+        }
+        switch (request.method) {
 
+            case "PUT":
+                let active = (true == request.body.active || 'true' == request.body.active);
 
+                if (active) {
+                    sensor.start();
+                } else {
+                    sensor.stop();
+                }
+            case "GET":
+                let sensorResponse = {
+                    id: sensor.id,
+                    active: (sensor.state == SensorState.ACTIVATED)
+                };
+                response.format({
+                    "application/json": () => {
+                        response.status(200).send(sensorResponse);
+                    },
+                    "default": () => {
+                        next(new httpError.NotAcceptable());
+                    }
+                });
                 break;
+
+            case "DELETE":
             case "CONNECT":
             case "HEAD":
             case "OPTIONS":

@@ -150,8 +150,52 @@ describe('Sensor Rest Service', function () {
             assert.equal(responseSensor.timestamp, phoneReadingPost.lastReading.timestamp, "timestamp matches last timestamp sent");
             assert.equal(response.HTTPCODE, 200);
         });
+
+        it('should return 404', function () {
+            let sensors = new Sensors(DummySensor, PhoneSensor);
+
+            request = new RequestMock("GET");
+            request.params.sensor = 'somerandomestringthatisreallynotarealsensorid';
+            response = new ResponseMock();
+            sensors.lastSensorReading(request, response);
+            response.formatData["application/json"]();
+            assert.equal(response.HTTPCODE, 404);
+
+            response = new ResponseMock();
+            sensors._404(request, response);
+            assert.equal(response.HTTPCODE, 404);
+        });
+
+        it('PUT (change) sensor active status', function () {
+            let sensors = new Sensors(DummySensor, PhoneSensor);
+
+            request = new RequestMock("PUT");
+            request.params.sensor = phoneReadingPost.UID;
+            request.body.active = false;
+            response = new ResponseMock();
+            sensors.sensorOptionsActive(request, response);
+            response.formatData["application/json"]();
+            assert.equal(response.HTTPCODE, 200);
+            assert.equal(response.responseData.data.active, false);
+
+        });
+
+        it('GET sensor active status', function () {
+            let sensors = new Sensors(DummySensor, PhoneSensor);
+
+            request = new RequestMock("GET");
+            request.params.sensor = phoneReadingPost.UID;
+            response = new ResponseMock();
+            sensors.sensorOptionsActive(request, response);
+            response.formatData["application/json"]();
+            assert.equal(response.HTTPCODE, 200);
+            assert.equal(response.responseData.data.active, false);
+
+        });
+
+
     });
-    
+
     describe('Sensor', function () {
         it('GET 1 sensor', function () {
             let sensors = new Sensors(DummySensor, DummySensor);

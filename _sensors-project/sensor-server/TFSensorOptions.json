@@ -1,1 +1,1 @@
-[{"type":"Temperature Sensor","ctor":"BrickletTemperature","normFact":100,"callbackEvent":"CALLBACK_TEMPERATURE","frequency":500,"periodFunc":"setTemperatureCallbackPeriod","simpleFunc":"getTemperature","UID":"tkw","target":"Tinkerforge","active":true,"unit":"°C"}]
+[{"type":"Temperature Sensor","ctor":"BrickletTemperature","normFact":100,"callbackEvent":"CALLBACK_TEMPERATURE","frequency":500,"periodFunc":"setTemperatureCallbackPeriod","simpleFunc":"getTemperature","UID":"tkw","target":"Tinkerforge","active":"true","unit":"°C"}]
