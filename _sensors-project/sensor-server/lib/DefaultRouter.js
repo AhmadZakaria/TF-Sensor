@@ -6,7 +6,7 @@ module.exports = class DefaultRouter extends require("express").Router
     {
         super(opts || DefaultRouter.defaultOptions());
         this.use("/", DefaultRouter.xPoweredBy, DefaultRouter.logSession, DefaultRouter.allowOnlyGetMethod);
-        this.get("/", require("./routes/index"));
+        this.get("/", require("./routes/dashboard"));
         // this.get("/index", require("./routes/index"));
         // this.get("/index.html", require("./routes/index"));
         this.get("/index", require("./routes/dashboard"));

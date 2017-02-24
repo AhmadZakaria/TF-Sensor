@@ -295,12 +295,37 @@ describe('Sensor Rest Service', function () {
 
         it('should return dashboard', function (done) {
             agent
+                .get('/')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    done();
+                });
+        });
+        it('should return dashboard', function (done) {
+            agent
                 .get('/dashboard.html')
                 .end((err, res) => {
                     res.should.have.status(200);
                     done();
                 });
         });
+        it('should return license', function (done) {
+            agent
+                .get('/license.html')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    done();
+                });
+        });
+
+        // it('should return system', function (done) {
+        //     agent
+        //         .get('/system.html')
+        //         .end((err, res) => {
+        //             res.should.have.status(200);
+        //             done();
+        //         });
+        // });
 
         it('should return 404', function (done) {
             agent
@@ -357,6 +382,14 @@ describe('Sensor Rest Service', function () {
                 .post('/dashboard.html')
                 .end((err, res) => {
                     res.should.have.status(405);
+                    done();
+                });
+        });
+        it('should return error', function (done) {
+            agent
+                .get('/error.html')
+                .end((err, res) => {
+                    res.should.have.status(500);
                     done();
                 });
         });
