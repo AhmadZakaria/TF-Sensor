@@ -247,30 +247,6 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
-        // let sensors = new Sensors(DummySensor, PhoneSensor);
-
-        // request = new RequestMock("GET");
-        // request.params.sensor = phoneReadingPost.UID;
-        // response = new ResponseMock();
-        // sensors.sensorOptionsActive(request, response, () => { });
-        // response.formatData["application/json"]();
-        // assert.equal(response.HTTPCODE, 200);
-        // assert.equal(response.responseData.data.active, false);
-
-
-        it('trying unallowed methods with sensor active status', function () {
-            let sensors = new Sensors(DummySensor, PhoneSensor);
-            let methods = ["DELETE", "CONNECT", "HEAD", "OPTIONS", "POST", "TRACE"];
-            for (m of methods) {
-                request = new RequestMock(m);
-                request.params.sensor = phoneReadingPost.UID;
-                response = new ResponseMock();
-                sensors.sensorOptionsActive(request, response, () => { });
-                // console.log(response)
-                assert.equal(response.HTTPCODE, 405);
-            }
-        });
-
         it('should disallowed delete method with sensor active status', (done) => {
             agent
                 .delete('/api/sensors/androidXYZ/sensorOptions/active')
@@ -313,4 +289,77 @@ describe('Sensor Rest Service', function () {
 
         });
     });
+
+
+    describe('Default Router', function () {
+
+        it('should return dashboard', function (done) {
+            agent
+                .get('/dashboard.html')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    done();
+                });
+        });
+
+        it('should return 404', function (done) {
+            agent
+                .get('/dashboard')
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    done();
+                });
+        });
+
+        it('should return 405', function (done) {
+            agent
+                .del('/dashboard.html')
+                .end((err, res) => {
+                    res.should.have.status(405);
+                    done();
+                });
+        });
+        it('should return 405', function (done) {
+
+            agent
+                .head('/dashboard.html')
+                .end((err, res) => {
+                    res.should.have.status(405);
+                    done();
+                });
+        });
+        it('should return 405', function (done) {
+            agent
+                .options('/dashboard.html')
+                .end((err, res) => {
+                    res.should.have.status(405);
+                    done();
+                });
+        });
+        it('should return 405', function (done) {
+            agent
+                .put('/dashboard.html')
+                .end((err, res) => {
+                    res.should.have.status(405);
+                    done();
+                });
+        });
+        it('should return 405', function (done) {
+            agent
+                .trace('/dashboard.html')
+                .end((err, res) => {
+                    res.should.have.status(405);
+                    done();
+                });
+        });
+        it('should return 405', function (done) {
+            agent
+                .post('/dashboard.html')
+                .end((err, res) => {
+                    res.should.have.status(405);
+                    done();
+                });
+        });
+    });
+
 });
