@@ -7,7 +7,6 @@ module.exports = class PhoneSensor extends Sensor {
 
     constructor(sensorOptions) {
         super(sensorOptions);
-        this.lastReading = { timestamp: null, value: null };
         this._target = this.sensorOptions.target;
         this._type = this.sensorOptions.type;
         this._id = this.sensorOptions.UID;
@@ -21,7 +20,7 @@ module.exports = class PhoneSensor extends Sensor {
                 () => {
                     let phoneSensorReading = new PhoneSensorReading(
                         Date.now(),
-                        this.lastReading
+                        this._lastReading
                     )
                     this.onchange({
                         reading: phoneSensorReading

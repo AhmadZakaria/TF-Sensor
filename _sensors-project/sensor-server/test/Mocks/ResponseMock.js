@@ -5,6 +5,7 @@ module.exports = class ResponseMock {
 
     constructor() {
         this.formatData = {};
+        this.options = new Map();
         this.responseData = {
             data: {},
             send: function (data) {
@@ -26,5 +27,7 @@ module.exports = class ResponseMock {
 
     format(data) { this.formatData = data }
 
-
+    set(k, v) {
+        this.options.set(k, v);
+    }
 }

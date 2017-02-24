@@ -24,9 +24,11 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
     "errorhandler": "^1.5.0",
     "mocha": "*",
-    "nyc": "^10.1.2"
+    "nyc": "^10.1.2",
+    "socket.io-client": "^1.7.3"
   },
   "main": "index",
   "license": "Apache-2.0",
@@ -40,6 +42,6 @@
   },
   "scripts": {
     "start": "node ./index",
-    "test": "nyc mocha -R spec -t 10000  test/*.js"
+    "test": "nyc --reporter=lcov mocha -R spec -t 10000  test/*.js"
   }
 }

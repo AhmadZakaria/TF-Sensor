@@ -1,1 +1,54 @@
-[{"type":"Temperature Sensor","ctor":"BrickletTemperature","normFact":100,"callbackEvent":"CALLBACK_TEMPERATURE","frequency":500,"periodFunc":"setTemperatureCallbackPeriod","simpleFunc":"getTemperature","UID":"tkw","target":"Tinkerforge","active":"true","unit":"°C"}]
+[
+    {
+        "type": "Temperature Sensor",
+        "ctor": "BrickletTemperature",
+        "normFact": "100",
+        "callbackEvent": "CALLBACK_TEMPERATURE",
+        "frequency": "500",
+        "periodFunc": "setTemperatureCallbackPeriod",
+        "simpleFunc": "getTemperature",
+        "UID": "tkw",
+        "target": "Tinkerforge",
+        "active": "true",
+        "unit": "°C"
+    },
+    {
+        "type": "Ambient Sensor",
+        "ctor": "BrickletAmbientLightV2",
+        "normFact": "100",
+        "callbackEvent": "CALLBACK_ILLUMINANCE",
+        "frequency": "500",
+        "periodFunc": "setIlluminanceCallbackPeriod",
+        "simpleFunc": "getIlluminance",
+        "UID": "yih",
+        "target": "Tinkerforge",
+        "active": "true",
+        "unit": "lux"
+    },
+    {
+        "type": "Sound Intensity Sensor",
+        "ctor": "BrickletSoundIntensity",
+        "normFact": "1.0",
+        "callbackEvent": "CALLBACK_INTENSITY",
+        "frequency": "500",
+        "periodFunc": "setIntensityCallbackPeriod",
+        "simpleFunc": "getIntensity",
+        "UID": "vqY",
+        "target": "Tinkerforge",
+        "active": "true",
+        "unit": "W/m^2"
+    },
+    {
+        "type": "Humidity Sensor",
+        "ctor": "BrickletHumidity",
+        "normFact": "10.0",
+        "callbackEvent": "CALLBACK_HUMIDITY",
+        "frequency": 500,
+        "periodFunc": "setHumidityCallbackPeriod",
+        "simpleFunc": "getHumidity",
+        "UID": "xDM",
+        "target": "Tinkerforge",
+        "active": "true",
+        "unit": "%"
+    }
+]

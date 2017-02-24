@@ -202,7 +202,7 @@ module.exports = class Sensors {
         if (sensor == undefined) {
             response.format({
                 "default": () => {
-                    next(new httpError.NotAcceptable());
+                    next(new httpError.NotFound());
                 }
             });
             return;
@@ -318,7 +318,7 @@ module.exports = class Sensors {
             });
             return;
         }
-        // console.log(JSON.stringify(sensor));
+
         let sensorResponse = {
             reading: sensor.lastReading.value,
             timestamp: sensor.lastReading.timestamp
@@ -411,7 +411,7 @@ module.exports = class Sensors {
             case "POST":
             case "TRACE":
             default:
-                response.set("allow", "PUT", "GET");
+                response.set("allow", "PUT, GET");
                 next(new httpError.MethodNotAllowed());
                 break;
         }

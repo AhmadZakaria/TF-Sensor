@@ -7,16 +7,17 @@ module.exports = class Sensor {
   constructor(sensorOptions) {
 
     this._sensorOptions = sensorOptions || {};
-    if(this.sensorOptions.frequency === 'undefined') {
+    if (this.sensorOptions.frequency === 'undefined') {
       this.sensorOptions.frequency = 500;
     }
     this._state = null;
     this._reading = null;
+    this._lastReading = { timestamp: null, value: null };
     this._type = null;
     this._taregt = null;
-    this._onactivate = event => {};
-    this._onchange = event => {};
-    this._onerror = event => {};
+    this._onactivate = event => { };
+    this._onchange = event => { };
+    this._onerror = event => { };
   }
   set id(value) {
     this._id = value;
@@ -48,6 +49,12 @@ module.exports = class Sensor {
   get reading() {
     return this._reading;
   }
+    set lastReading(value) {
+    this._lastReading = value;
+  }
+  get lastReading() {
+    return this._lastReading;
+  }
   set onactivate(value) {
     this._onactivate = value;
   }
@@ -66,7 +73,7 @@ module.exports = class Sensor {
   get unit() {
     return this._unit;
   }
-  
+
   set onchange(value) {
     this._onchange = value;
   }

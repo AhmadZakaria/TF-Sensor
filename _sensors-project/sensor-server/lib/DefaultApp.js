@@ -1,9 +1,7 @@
 "use strict";
 
-module.exports = class DefaultApp
-{
-    constructor(worker, pkg, config)
-    {
+module.exports = class DefaultApp {
+    constructor(worker, pkg, config) {
         const compress = require("compression");
         const ejs = require("ejs");
         const express = require("express");
@@ -42,12 +40,10 @@ module.exports = class DefaultApp
 
         /* ===== Define log stream ===== */
         const logdir = path.join(os.homedir(), ".logs");
-        try
-        {
+        try {
             fs.accessSync(logdir);
         }
-        catch (error)
-        {
+        catch (error) {
             debug(error.message);
             debug(`Creating new directory: ${logdir}`);
             mkdirp.sync(logdir)
@@ -59,7 +55,7 @@ module.exports = class DefaultApp
         app.use(morgan("combined", { "stream": access }));
 
         /* ===== Compression ===== */
-        app.use(compress({  "threshold": 32, "chunkSize": 16 * 1024 }));
+        app.use(compress({ "threshold": 32, "chunkSize": 16 * 1024 }));
 
         /* ===== Static ===== */
         app.use(express.static(app.locals.public));
@@ -99,38 +95,41 @@ module.exports = class DefaultApp
         this.config = config;
     }
 
-    start()
-    {
+    start() {
         const fs = require("fs");
         const path = require("path");
         const ipaddress = this.config["http"]["ipaddress"];
         const port = this.config["http"]["port"];
 
         let server = null;
-        if(this.config["http"]["secure"])
-        {
+        if (this.config["http"]["secure"]) {
             let kf = path.join(this.config.basedir, "config", "certs",
                 this.config["http"]["key"]);
             let cf = path.join(this.config.basedir, "config", "certs",
                 this.config["http"]["cert"]);
-            if(!fs.existsSync(kf) || !fs.existsSync(cf))
-            {
+            if (!fs.existsSync(kf) || !fs.existsSync(cf)) {
                 throw new Error("HTTP certificate file not found.");
             }
             let options =
-            {
-                "key": fs.readFileSync(kf),
-                "cert": fs.readFileSync(cf)
-            };
+                {
+                    "key": fs.readFileSync(kf),
+                    "cert": fs.readFileSync(cf)
+                };
             server = require("https").createServer(options, this.app);
         }
-        else
-        {
+        else {
             server = require("http").createServer(this.app);
         }
         server.timeout = 10000;
         server.listen(port, ipaddress, () => {
             console.info(`${this.app.locals.pkg["name"]} [worker ${this.app.locals.worker.id}] started at ${new Date()}. IP address: ${ipaddress}, port: ${port}`);
         });
+        return server;
     }
+//     get app() {
+//         return this.app;
+//     }
+//     set app(value) {
+//     this.app = value;
+//   }
 };
