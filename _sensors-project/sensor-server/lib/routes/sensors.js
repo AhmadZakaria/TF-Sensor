@@ -411,7 +411,7 @@ module.exports = class Sensors {
             case "POST":
             case "TRACE":
             default:
-                response.set("allow", "PUT");
+                response.set("allow", "PUT", "GET");
                 next(new httpError.MethodNotAllowed());
                 break;
         }
