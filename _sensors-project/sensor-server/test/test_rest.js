@@ -49,7 +49,7 @@ var agent = chai.request.agent(server);
 // console.log(app);
 describe('Sensor Rest Service', function () {
     describe('Sensors', function () {
-        it('should return instanceof Sensors', function (done) {
+        it('should return instanceof Sensors', function () {
 
             let sensors = new Sensors(DummySensor, DummySensor);
 
@@ -57,7 +57,6 @@ describe('Sensor Rest Service', function () {
             // sensors.clearSensors();
 
             assert.equal(sensors instanceof Sensors, true);
-            done();
         });
 
         it('GET 0 Sensors _ chai', (done) => {
