@@ -16,7 +16,7 @@ module.exports = function (request, response) {
             }
         }
     }
-    console.log(addresses[0]);
+    // console.log(addresses[0]);
 
     response.render("dashboard", {
         "menu_name": "dashboard",

@@ -42,6 +42,6 @@
   },
   "scripts": {
     "start": "node ./index",
-    "test": "nyc  --reporter=lcov mocha -R spec -t 10000  test/*.js; nyc report"
+    "test": "nyc  --reporter=lcov mocha -R spec -t 10000  test/*.js &&  nyc report"
   }
 }

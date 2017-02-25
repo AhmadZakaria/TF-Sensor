@@ -1,7 +1,5 @@
 const assert = require('chai').assert;
-const chai = require('chai');
 const chaiHttp = require('chai-http');
-const DummySensor = require('../../dummy-sensor/lib/DummySensor');
 const Sensors = require("../lib/routes/sensors");
 const http = require("http");
 const httpError = require("http-errors");
@@ -11,9 +9,7 @@ const NextMock = require("./Mocks/NextMock")
 const TFSensor = require('../../tf-sensor/lib/TFSensor');
 const PhoneSensor = require('../../phone-sensor/lib/PhoneSensor');
 
-const index = require("../index");
-// let app = index.app;
-
+const chai = require('chai');
 const TFSensorOptions = require("./Mocks/TFSensorOptions")
 process.env.NODE_ENV = 'test';
 let should = chai.should();
@@ -39,25 +35,28 @@ else {
     http.globalAgent.options.agent = false;
 }
 
-app = new (require("../lib/DefaultApp"))({ id: "worker1" }, pkg, config);
+if (cluster.isMaster && !module.parent.parent)
+    cluster.fork();
+else {
+    app = new (require("../lib/DefaultApp"))(cluster.Worker(), pkg, config);
+}
+
 let server = app.start();
-
-
 
 // let server = "http://0.0.0.0:8080";
 var agent = chai.request.agent(server);
 // console.log(app);
 describe('Sensor Rest Service', function () {
     describe('Sensors', function () {
-        it('should return instanceof Sensors', function () {
+        // it('should return instanceof Sensors', function () {
 
-            let sensors = new Sensors(DummySensor, DummySensor);
+        //     let sensors = new Sensors(DummySensor, DummySensor);
 
-            // sensors.clearsensorOptions();
-            // sensors.clearSensors();
+        //     // sensors.clearsensorOptions();
+        //     // sensors.clearSensors();
 
-            assert.equal(sensors instanceof Sensors, true);
-        });
+        //     assert.equal(sensors instanceof Sensors, true);
+        // });
 
         it('GET 0 Sensors _ chai', (done) => {
             agent
@@ -68,58 +67,58 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
-        it('GET 0 Sensors', function () {
+        // it('GET 0 Sensors', function () {
 
-            let sensors = new Sensors(DummySensor, DummySensor);
+        //     let sensors = new Sensors(DummySensor, DummySensor);
 
-            var request = new RequestMock("GET");
-            var response = new ResponseMock();
-
-
-            sensors.sensors(request, response, () => { });
-
-            response.formatData["application/json"]();
-
-            assert.equal(response.responseData.data["sensors"].length, 0);
-        });
-        it('GET 1 sensor', function () {
-
-            let sensors = new Sensors(DummySensor, DummySensor);
-
-            var request = new RequestMock("POST");
-            request.body = TFSensorOptions.temperatureSensorOptions;
-
-            var response = new ResponseMock();
-
-            sensors.sensors(request, response, () => { });
-
-            response.formatData["application/json"]();
-
-            assert.equal(response.responseData.data[0].id, request.body.UID);
-            assert.equal(response.HTTPCODE, 201);
-        });
-        it('GET 2 sensors', function () {
-
-            let sensors = new Sensors(DummySensor, DummySensor);
-
-            var request = new RequestMock("POST");
-            request.body = TFSensorOptions.ambientLightSensorOptions;
-
-            var response = new ResponseMock();
-
-            sensors.sensors(request, response, () => { });
-
-            request = new RequestMock("GET");
-            response = new ResponseMock();
+        //     var request = new RequestMock("GET");
+        //     var response = new ResponseMock();
 
 
-            sensors.sensors(request, response, () => { });
+        //     sensors.sensors(request, response, () => { });
 
-            response.formatData["application/json"]();
+        //     response.formatData["application/json"]();
 
-            assert.equal(response.responseData.data["sensors"].length, 2);
-            assert.equal(response.HTTPCODE, 200);
-        });
+        //     assert.equal(response.responseData.data["sensors"].length, 0);
+        // });
+        // it('GET 1 sensor', function () {
+
+        //     let sensors = new Sensors(DummySensor, DummySensor);
+
+        //     var request = new RequestMock("POST");
+        //     request.body = TFSensorOptions.temperatureSensorOptions;
+
+        //     var response = new ResponseMock();
+
+        //     sensors.sensors(request, response, () => { });
+
+        //     response.formatData["application/json"]();
+
+        //     assert.equal(response.responseData.data[0].id, request.body.UID);
+        //     assert.equal(response.HTTPCODE, 201);
+        // });
+        // it('GET 2 sensors', function () {
+
+        //     let sensors = new Sensors(DummySensor, DummySensor);
+
+        //     var request = new RequestMock("POST");
+        //     request.body = TFSensorOptions.ambientLightSensorOptions;
+
+        //     var response = new ResponseMock();
+
+        //     sensors.sensors(request, response, () => { });
+
+        //     request = new RequestMock("GET");
+        //     response = new ResponseMock();
+
+
+        //     sensors.sensors(request, response, () => { });
+
+        //     response.formatData["application/json"]();
+
+        //     assert.equal(response.responseData.data["sensors"].length, 2);
+        //     assert.equal(response.HTTPCODE, 200);
+        // });
 
         it('CREATE phone sensor', function (done) {
             agent
@@ -173,9 +172,21 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
+        it('SEND readings from phone sensor, with wrong accept type', function (done) {
+            agent
+                .post('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
+                .set("accept", "application/pdf")
+                .send(phoneReadingPost)
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
         it('GET last reading from phone sensor', function (done) {
             agent
                 .get('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
+                .set("accept", "application/json")
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.have.property('reading');
@@ -183,6 +194,34 @@ describe('Sensor Rest Service', function () {
                     // console.log(res.body)
                     r.reading.should.eq(phoneReadingPost.lastReading.value);
                     r.timestamp.should.eq(phoneReadingPost.lastReading.timestamp);
+                    done();
+                });
+        });
+
+        it('GET last reading from phone sensor, with wrong accept type', function (done) {
+            agent
+                .get('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
+                .set("accept", "application/pdf")
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
+        it('DELETE an existing sensor', function (done) {
+            agent
+                .del('/api/sensors/' + TFSensorOptions.temperatureSensorOptions.UID)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    done();
+                });
+        });
+
+        it('DELETE a non-existing sensor', function (done) {
+            agent
+                .del('/api/sensors/' + "somerandomestringthatisreallynotarealsensorid")
+                .end((err, res) => {
+                    res.should.have.status(404);
                     done();
                 });
         });
@@ -210,46 +249,68 @@ describe('Sensor Rest Service', function () {
 
 
 
-        it('PUT (change) sensor active status', function () {
-            let sensors = new Sensors(DummySensor, PhoneSensor);
+        it('Activate existing sensor', function (done) {
+            agent
+                .put('/api/sensors/' + phoneReadingPost.UID + '/sensorOptions/active')
+                .send({ active: false })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.property('active');
+                    res.body.active.should.eq(false);
 
-            request = new RequestMock("PUT");
-            request.params.sensor = phoneReadingPost.UID;
-            request.body.active = false;
-            response = new ResponseMock();
-            sensors.sensorOptionsActive(request, response, () => { });
-            response.formatData["application/json"]();
-            assert.equal(response.HTTPCODE, 200);
-            assert.equal(response.responseData.data.active, false);
+                    done();
+                });
         });
 
-        it('GET sensor active status', function () {
-            let sensors = new Sensors(DummySensor, PhoneSensor);
+        it('Deactivate existing sensor', function (done) {
+            agent
+                .put('/api/sensors/' + phoneReadingPost.UID + '/sensorOptions/active')
+                .send({ active: true })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.property('active');
+                    res.body.active.should.eq(true);
 
-            request = new RequestMock("GET");
-            request.params.sensor = phoneReadingPost.UID;
-            response = new ResponseMock();
-            sensors.sensorOptionsActive(request, response, () => { });
-            response.formatData["application/json"]();
-            assert.equal(response.HTTPCODE, 200);
-            assert.equal(response.responseData.data.active, false);
+                    done();
+                });
         });
 
-        it('2GET sensor active status', (done) => {
+        it('Activate non-existing sensor', function (done) {
+            agent
+                .put('/api/sensors/' + "somerandomUID" + '/sensorOptions/active')
+                .send({ active: false })
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    done();
+                });
+        });
+
+        it('Activate non-existing sensor', function (done) {
+            agent
+                .put('/api/sensors/' + "somerandomUID" + '/sensorOptions/active')
+                .set("accept", "application/pdf")
+                .send({ active: false })
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    done();
+                });
+        });
+
+        it('GET sensor active status', function (done) {
             agent
                 .get('/api/sensors/' + phoneReadingPost.UID + '/sensorOptions/active')
                 .end((err, res) => {
-                    // console.log(res)
                     res.should.have.status(200);
                     res.body.should.have.property('active');
-                    res.body.active.should.be.eql(false);
+                    res.body.active.should.eq(true);
+
                     done();
                 });
         });
 
         it('should disallowed delete method with sensor active status', (done) => {
             agent
-                .delete('/api/sensors/androidXYZ/sensorOptions/active')
+                .del('/api/sensors/' + phoneReadingPost.UID + '/sensorOptions/active')
                 .end((err, res) => {
                     // console.log(res)
                     res.should.have.status(405);
@@ -264,32 +325,44 @@ describe('Sensor Rest Service', function () {
     });
 
     describe('Sensor', function () {
-        it('GET 1 sensor', function () {
-            let sensors = new Sensors(DummySensor, DummySensor);
-
-
-            //Getting Sensor Details
-            request = new RequestMock("GET");
-            request.params = {
-                sensor: TFSensorOptions.temperatureSensorOptions.UID
-            }
-
-
-            response = new ResponseMock();
-            next = new NextMock();
-
-
-
-            sensors.sensor(request, response, next.next);
-
-
-            response.formatData["application/json"]();
-
-            assert.equal(response.responseData.data.id, TFSensorOptions.temperatureSensorOptions.UID);
-
+        it('GET 1 sensor', (done) => {
+            agent
+                .get('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.property('id');
+                    res.body.id.should.be.eql(TFSensorOptions.humiditySensorOptions.UID);
+                    done();
+                });
         });
-    });
 
+        it('PUT change sensor frequency', (done) => {
+            let newOpts = TFSensorOptions.humiditySensorOptions;
+            newOpts.frequency = '600';
+
+            agent
+                .put('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
+                .set("content-type", "application/json")
+                .send(newOpts)
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    res.should.have.status(200);
+                    done();
+                });
+        });
+
+        it('GET changed sensor frequency', (done) => {
+            agent
+                .get('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
+                .end((err1, res1) => {
+                    res1.should.have.status(200);
+                    res1.body.should.have.property('frequency');
+                    assert.equal(res1.body.frequency500);
+                    done();
+                });
+        });
+
+    });
 
     describe('Default Router', function () {
 
@@ -309,6 +382,7 @@ describe('Sensor Rest Service', function () {
                     done();
                 });
         });
+
         it('should return license', function (done) {
             agent
                 .get('/license.html')
@@ -317,15 +391,6 @@ describe('Sensor Rest Service', function () {
                     done();
                 });
         });
-
-        // it('should return system', function (done) {
-        //     agent
-        //         .get('/system.html')
-        //         .end((err, res) => {
-        //             res.should.have.status(200);
-        //             done();
-        //         });
-        // });
 
         it('should return 404', function (done) {
             agent
@@ -336,55 +401,6 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
-        it('should return 405', function (done) {
-            agent
-                .del('/dashboard.html')
-                .end((err, res) => {
-                    res.should.have.status(405);
-                    done();
-                });
-        });
-        it('should return 405', function (done) {
-
-            agent
-                .head('/dashboard.html')
-                .end((err, res) => {
-                    res.should.have.status(405);
-                    done();
-                });
-        });
-        it('should return 405', function (done) {
-            agent
-                .options('/dashboard.html')
-                .end((err, res) => {
-                    res.should.have.status(405);
-                    done();
-                });
-        });
-        it('should return 405', function (done) {
-            agent
-                .put('/dashboard.html')
-                .end((err, res) => {
-                    res.should.have.status(405);
-                    done();
-                });
-        });
-        it('should return 405', function (done) {
-            agent
-                .trace('/dashboard.html')
-                .end((err, res) => {
-                    res.should.have.status(405);
-                    done();
-                });
-        });
-        it('should return 405', function (done) {
-            agent
-                .post('/dashboard.html')
-                .end((err, res) => {
-                    res.should.have.status(405);
-                    done();
-                });
-        });
         it('should return error', function (done) {
             agent
                 .get('/error.html')
@@ -392,6 +408,59 @@ describe('Sensor Rest Service', function () {
                     res.should.have.status(500);
                     done();
                 });
+        });
+
+        describe('Test unallowed verbs', function () {
+
+            it('should return 405', function (done) {
+                agent
+                    .del('/dashboard.html')
+                    .end((err, res) => {
+                        res.should.have.status(405);
+                        done();
+                    });
+            });
+            it('should return 405', function (done) {
+
+                agent
+                    .head('/dashboard.html')
+                    .end((err, res) => {
+                        res.should.have.status(405);
+                        done();
+                    });
+            });
+            it('should return 405', function (done) {
+                agent
+                    .options('/dashboard.html')
+                    .end((err, res) => {
+                        res.should.have.status(405);
+                        done();
+                    });
+            });
+            it('should return 405', function (done) {
+                agent
+                    .put('/dashboard.html')
+                    .end((err, res) => {
+                        res.should.have.status(405);
+                        done();
+                    });
+            });
+            it('should return 405', function (done) {
+                agent
+                    .trace('/dashboard.html')
+                    .end((err, res) => {
+                        res.should.have.status(405);
+                        done();
+                    });
+            });
+            it('should return 405', function (done) {
+                agent
+                    .post('/dashboard.html')
+                    .end((err, res) => {
+                        res.should.have.status(405);
+                        done();
+                    });
+            });
         });
     });
 

@@ -230,18 +230,33 @@ module.exports = class Sensors {
                 if (sensor.target === 'Tinkerforge') {
                     sensorOptions = sensorOptions.filter(i => i.UID != sensor.id)
                     var json = JSON.stringify(sensorOptions);
-                    fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
-                        //console.log("Writing successful (sensors POST" + sensor.id + " )!");
-                    });
+                    // fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
+                    //console.log("Writing successful (sensors POST" + sensor.id + " )!");
+                    // });
                 }
 
                 sensors.delete(sensor.id);
-
+                response.format({
+                    "application/json": () => {
+                        response.status(200).send({ "message": "Sensor deleted" });
+                    },
+                    "default": () => {
+                        next(new httpError.NotAcceptable());
+                    }
+                });
+                break;
             case "PUT":
                 sensor.stop();
 
                 if (request.body.target != sensor.target) {
-                    //Not allowed DoTo Status Message
+                console.log(request.body.target)
+                console.log(sensor.target)
+                    response.format({
+                        "default": () => {
+                            next(new httpError.NotAcceptable());
+                        }
+                    });
+
                     break;
                 }
 
@@ -252,10 +267,10 @@ module.exports = class Sensors {
                     sensorOptions = sensorOptions.filter(i => i.UID != sensor.id)
                     sensor = new typeHardwareSensor(request.body);
                     sensorOptions.push(request.body);
-                    var json = JSON.stringify(sensorOptions);
-                    fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
-                        //console.log("Writing successful (sensors POST" + sensor.id + " )!");
-                    });
+                    // var json = JSON.stringify(sensorOptions);
+                    // fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
+                    //console.log("Writing successful (sensors POST" + sensor.id + " )!");
+                    // });
 
                 } else {
                     sensor = new typePhoneSensor(request.body);
@@ -278,7 +293,7 @@ module.exports = class Sensors {
                 }
 
                 sensors.set(sensor.id, sensor);
-                sensorsResponse = Array
+                let sensorsResponse = Array
                     .from(sensors.keys())
                     .map(id => ({
                         id: id
@@ -286,7 +301,7 @@ module.exports = class Sensors {
 
                 response.format({
                     "application/json": () => {
-                        response.status(201).send(sensorsResponse);
+                        response.status(200).send(sensorsResponse);
                     },
                     "default": () => {
                         next(new httpError.NotAcceptable());
@@ -374,7 +389,7 @@ module.exports = class Sensors {
                     response.status(404).type("application/json").send({ "error": "Sensor doesn't exist!" });
                 },
                 "default": () => {
-                    next(new httpError.NotAcceptable());
+                    next(new httpError.NotFound());
                 }
             });
             return;

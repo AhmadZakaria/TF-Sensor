@@ -116,20 +116,21 @@ module.exports = class DefaultApp {
                     "cert": fs.readFileSync(cf)
                 };
             server = require("https").createServer(options, this.app);
-        }
-        else {
+        } else {
             server = require("http").createServer(this.app);
         }
         server.timeout = 10000;
-        server.listen(port, ipaddress, () => {
-            console.info(`${this.app.locals.pkg["name"]} [worker ${this.app.locals.worker.id}] started at ${new Date()}. IP address: ${ipaddress}, port: ${port}`);
-        });
+        // Don't listen to this port if the app is required from a test script.
+        if (!module.parent.parent)
+            server.listen(port, ipaddress, () => {
+                console.info(`${this.app.locals.pkg["name"]} [worker ${this.app.locals.worker.id}] started at ${new Date()}. IP address: ${ipaddress}, port: ${port}`);
+            });
         return server;
     }
-//     get app() {
-//         return this.app;
-//     }
-//     set app(value) {
-//     this.app = value;
-//   }
+    //     get app() {
+    //         return this.app;
+    //     }
+    //     set app(value) {
+    //     this.app = value;
+    //   }
 };

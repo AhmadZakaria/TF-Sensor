@@ -14,7 +14,7 @@ module.exports = class Sensor {
     this._reading = null;
     this._lastReading = { timestamp: null, value: null };
     this._type = null;
-    this._taregt = null;
+    this._target = null;
     this._onactivate = event => { };
     this._onchange = event => { };
     this._onerror = event => { };

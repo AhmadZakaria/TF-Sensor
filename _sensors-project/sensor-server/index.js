@@ -6,7 +6,7 @@ const path = require("path");
 const config = require(path.join(__dirname, "config", "start.json"));
 const pkg = require(path.join(__dirname, "package.json"));
 const debug = require("util").debuglog(pkg.name);
-var app ;
+var app;
 process.title = pkg.name;
 config.basedir = __dirname;
 if (config.http.secure) {
@@ -20,10 +20,10 @@ else {
     http.globalAgent.options.agent = false;
 }
 
-if (cluster.isMaster) {
-    // for (let i = 0; i < cpus; ++i) {
-    cluster.fork();
-    // }
+if (cluster.isMaster && !module.parent.parent) {
+    for (let i = 0; i < cpus; ++i) {
+        cluster.fork();
+    }
 }
 else {
     launcher(cluster.worker, pkg, config);

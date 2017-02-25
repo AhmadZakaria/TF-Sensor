@@ -12,7 +12,6 @@ module.exports = class DefaultRouter extends require("express").Router
         this.get("/index", require("./routes/dashboard"));
         this.get("/index.html", require("./routes/dashboard"));
         this.get("/dashboard.html", require("./routes/dashboard"));
-        this.get("/system.html", require("./routes/system"));
         this.get("/license.html", require("./routes/license"));
         this.get("/error.html", require("./routes/error"));
 

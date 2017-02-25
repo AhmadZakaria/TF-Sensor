@@ -22,7 +22,8 @@ var TFSensorOptions = {
         target: 'Tinkerforge',
         //
         "active": "true",
-        unit: "°C"
+        unit: "°C",
+        "target": "Tinkerforge"
     },
 
     ambientLightSensorOptions: {
@@ -42,7 +43,8 @@ var TFSensorOptions = {
         // sensor UID
         UID: 'yih',
         "active": "true",
-        unit: "lux"
+        unit: "lux",
+        "target": "Tinkerforge"
     },
 
     humiditySensorOptions: {
@@ -62,7 +64,8 @@ var TFSensorOptions = {
         // sensor UID
         UID: 'xDM',
         "active": "true",
-        unit: "%"
+        unit: "%",
+        "target": "Tinkerforge"
     },
     soundSensorOptions: {
         type: "Sound Intensity Sensor",
@@ -81,7 +84,9 @@ var TFSensorOptions = {
         // sensor UID
         UID: 'vqY',
         "active": "true",
-        unit: "W/m^2"
+        unit: "W/m^2",
+        "target": "Tinkerforge"
+
     },
     phoneSensorOptions: {
         "type": "Accelerometer",
