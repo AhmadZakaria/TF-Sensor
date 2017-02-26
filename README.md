@@ -1,4 +1,2 @@
-seminar-webapps-wot
+TF-Sensor [![Build Status](https://travis-ci.org/AhmadZakaria/TF-Sensor.svg?branch=master)](https://travis-ci.org/AhmadZakaria/TF-Sensor)
 ===================
-
-Simple exercises for our seminars related to distributed web applications and the Web of Things.
