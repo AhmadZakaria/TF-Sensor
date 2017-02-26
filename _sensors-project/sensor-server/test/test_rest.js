@@ -9,6 +9,9 @@ const NextMock = require("./Mocks/NextMock")
 const TFSensor = require('../../tf-sensor/lib/TFSensor');
 const PhoneSensor = require('../../phone-sensor/lib/PhoneSensor');
 
+const io = require('socket.io-client')
+const WebSocket = require('ws');
+
 const chai = require('chai');
 const TFSensorOptions = require("./Mocks/TFSensorOptions")
 process.env.NODE_ENV = 'test';
@@ -42,23 +45,14 @@ else {
 }
 
 let server = app.start();
+var agent = chai.request.agent(server);
 
 // let server = "http://0.0.0.0:8080";
-var agent = chai.request.agent(server);
 // console.log(app);
 describe('Sensor Rest Service', function () {
     describe('Sensors', function () {
-        // it('should return instanceof Sensors', function () {
 
-        //     let sensors = new Sensors(DummySensor, DummySensor);
-
-        //     // sensors.clearsensorOptions();
-        //     // sensors.clearSensors();
-
-        //     assert.equal(sensors instanceof Sensors, true);
-        // });
-
-        it('GET 0 Sensors _ chai', (done) => {
+        it('get sensors', (done) => {
             agent
                 .get('/api/sensors')
                 .end((err, res) => {
@@ -120,6 +114,19 @@ describe('Sensor Rest Service', function () {
         //     assert.equal(response.HTTPCODE, 200);
         // });
 
+        it('CREATE deactivated TF sensor', function (done) {
+            senOpts = TFSensorOptions.soundSensorOptions;
+            senOpts.UID = "asde";
+            senOpts.active = false;
+            agent
+                .post('/api/sensors')
+                .send(senOpts)
+                .end((err, res) => {
+                    res.should.have.status(201);
+                    done();
+                });
+        });
+
         it('CREATE phone sensor', function (done) {
             agent
                 .post('/api/sensors')
@@ -143,74 +150,9 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
-
-        let phoneReadingPost = {
-            "type": "Accelerometer",
-            "frequency": "500",
-            "UID": "androidXYZ",
-            "target": "android",
-            "active": "true",
-            "lastReading": {
-                "value": 60,
-                "timestamp": "1487535337000"
-            }
-        };
-
-        nowTime = Date.now();
-        phoneReadingPost.lastReading.timestamp = nowTime;
-
-        it('SEND readings from phone sensor', function (done) {
-            agent
-                .post('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
-                // .set("content-type", "application/json")
-                .send(phoneReadingPost)
-                .end((err, res) => {
-                    // if (err)
-                    // console.log(res.body)
-                    res.should.have.status(201);
-                    done();
-                });
-        });
-
-        it('SEND readings from phone sensor, with wrong accept type', function (done) {
-            agent
-                .post('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
-                .set("accept", "application/pdf")
-                .send(phoneReadingPost)
-                .end((err, res) => {
-                    res.should.have.status(406);
-                    done();
-                });
-        });
-
-        it('GET last reading from phone sensor', function (done) {
-            agent
-                .get('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
-                .set("accept", "application/json")
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.have.property('reading');
-                    r = res.body;
-                    // console.log(res.body)
-                    r.reading.should.eq(phoneReadingPost.lastReading.value);
-                    r.timestamp.should.eq(phoneReadingPost.lastReading.timestamp);
-                    done();
-                });
-        });
-
-        it('GET last reading from phone sensor, with wrong accept type', function (done) {
-            agent
-                .get('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
-                .set("accept", "application/pdf")
-                .end((err, res) => {
-                    res.should.have.status(406);
-                    done();
-                });
-        });
-
         it('DELETE an existing sensor', function (done) {
             agent
-                .del('/api/sensors/' + TFSensorOptions.temperatureSensorOptions.UID)
+                .del('/api/sensors/' + "asde")
                 .end((err, res) => {
                     res.should.have.status(200);
                     done();
@@ -240,7 +182,7 @@ describe('Sensor Rest Service', function () {
         it('should return 404', function (done) {
             agent
                 .post('/api/sensors/' + "somerandomestringthatisreallynotarealsensorid" + 'androidXYZ/sensorReadings/latest')
-                .send(phoneReadingPost)
+                .send(TFSensorOptions.phoneSensorOptions)
                 .end((err, res) => {
                     res.should.have.status(404);
                     done();
@@ -251,7 +193,7 @@ describe('Sensor Rest Service', function () {
 
         it('Activate existing sensor', function (done) {
             agent
-                .put('/api/sensors/' + phoneReadingPost.UID + '/sensorOptions/active')
+                .put('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorOptions/active')
                 .send({ active: false })
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -264,7 +206,7 @@ describe('Sensor Rest Service', function () {
 
         it('Deactivate existing sensor', function (done) {
             agent
-                .put('/api/sensors/' + phoneReadingPost.UID + '/sensorOptions/active')
+                .put('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorOptions/active')
                 .send({ active: true })
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -298,7 +240,7 @@ describe('Sensor Rest Service', function () {
 
         it('GET sensor active status', function (done) {
             agent
-                .get('/api/sensors/' + phoneReadingPost.UID + '/sensorOptions/active')
+                .get('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorOptions/active')
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.have.property('active');
@@ -310,7 +252,7 @@ describe('Sensor Rest Service', function () {
 
         it('should disallowed delete method with sensor active status', (done) => {
             agent
-                .del('/api/sensors/' + phoneReadingPost.UID + '/sensorOptions/active')
+                .del('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorOptions/active')
                 .end((err, res) => {
                     // console.log(res)
                     res.should.have.status(405);
@@ -324,7 +266,76 @@ describe('Sensor Rest Service', function () {
 
     });
 
+    describe('lastSensorReading', function () {
+
+        let phoneReadingPost = {
+            "type": "Accelerometer",
+            "frequency": "500",
+            "UID": "androidXYZ",
+            "target": "android",
+            "active": "true",
+            "lastReading": {
+                "value": 60,
+                "timestamp": "1487535337000"
+            }
+        };
+
+        nowTime = Date.now();
+        phoneReadingPost.lastReading.value = 70;
+        phoneReadingPost.lastReading.timestamp = nowTime;
+
+        it('SEND readings from phone sensor', function (done) {
+            agent
+                .post('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
+                // .set("content-type", "application/json")
+                .send(phoneReadingPost)
+                .end((err, res) => {
+                    // if (err)
+                    // console.log(res.body)
+                    res.should.have.status(201);
+                    done();
+                });
+        });
+
+        it('SEND readings from phone sensor, with wrong accept type', function (done) {
+            agent
+                .post('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
+                .set("accept", "application/pdf")
+                .send(phoneReadingPost)
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
+        it('GET last reading from phone sensor', function (done) {
+            agent
+                .get('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
+                .set("accept", "application/json")
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.property('value');
+                    r = res.body;
+                    // console.log(res.body)
+                    r.value.should.eq(phoneReadingPost.lastReading.value);
+                    r.timestamp.should.eq(phoneReadingPost.lastReading.timestamp);
+                    done();
+                });
+        });
+
+        it('GET last reading from phone sensor, with wrong accept type', function (done) {
+            agent
+                .get('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
+                .set("accept", "application/pdf")
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+    });
+
     describe('Sensor', function () {
+
         it('GET 1 sensor', (done) => {
             agent
                 .get('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
@@ -462,6 +473,88 @@ describe('Sensor Rest Service', function () {
                     });
             });
         });
+    });
+
+
+    describe('Testing websockets', function () {
+
+        var connected = false;
+        var ws;
+        beforeEach(function (done) {
+            // chai.request.abort();
+            // Setup
+            ws = new WebSocket('ws://0.0.0.0:8888', {
+                origin: 'http://0.0.0.0/'
+            });
+
+            ws.on('open', function open() {
+                // console.log('connected');
+                connected = true;
+                done();
+            });
+
+            ws.on('close', function close() {
+                // console.log('disconnected');
+            });
+
+
+        });
+
+        afterEach(function (done) {
+            // Cleanup
+            if (connected) {
+                // console.log('disconnecting...');
+                ws.close();
+                done();
+            } else {
+                // There will not be a connection unless you have done() in beforeEach, socket.on('connect'...)
+                // console.log('no connection to break...');
+                done();
+            }
+
+        });
+
+
+        let dataToSend = {
+            "lastReading": {
+                "value": 60,
+                "timestamp": 1487538472000
+            }
+        };
+
+        nowTime = Date.now();
+        dataToSend.lastReading.timestamp = nowTime;
+
+        it('should receive data via websocket after posting from phone', function (done) {
+            let dataToSend = {
+                "lastReading": {
+                    "value": 60,
+                    "timestamp": 1487538472000
+                }
+            };
+
+            nowTime = Date.now();
+            dataToSend.lastReading.timestamp = nowTime;
+
+            ws.on('message', function incoming(data, flags) {
+                // console.log(data);
+                data = JSON.parse(data)
+                data.should.have.property("reading");
+                data.should.have.property("timestamp");
+                data.reading.should.eq(dataToSend.lastReading.value);
+                data.timestamp.should.eq(dataToSend.lastReading.timestamp);
+                done();
+            });
+
+            agent
+                .post('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
+                .send(dataToSend)
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    res.should.have.status(201);
+                });
+        });
+
     });
 
 });

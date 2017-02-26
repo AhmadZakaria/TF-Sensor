@@ -54,29 +54,31 @@ module.exports = class TFSensor extends Sensor {
                         this.lastReadingTime = nowTime;
                     }, () => { }
                 );
+                return new Promise((resolve, reject) => {
+                    this._intervalHandle = setInterval(
+                        () => {
+                            if (this.lastBroadcastTime != this.lastReadingTime) { // new un-broadcasted reading
+                                let tfSensorReading = new TFSensorReading(
+                                    this.lastReadingTime,
+                                    this.lastReading
+                                )
+
+                                this.onchange({
+                                    reading: tfSensorReading
+                                });
+                                this.lastBroadcastTime = this.lastReadingTime; // mark reading as broadcasted
+                            }
+                        },
+                        this.sensorOptions.frequency
+                    );
+                    resolve();
+                });
+
             }
         );
 
 
-        return new Promise((resolve, reject) => {
-            this._intervalHandle = setInterval(
-                () => {
-                    if (this.lastBroadcastTime != this.lastReadingTime) { // new un-broadcasted reading
-                        let tfSensorReading = new TFSensorReading(
-                            this.lastReadingTime,
-                            this.lastReading
-                        )
 
-                        this.onchange({
-                            reading: tfSensorReading
-                        });
-                        this.lastBroadcastTime = this.lastReadingTime; // mark reading as broadcasted
-                    }
-                },
-                this.sensorOptions.frequency
-            );
-            resolve();
-        });
     }
 
     handleStopped() {

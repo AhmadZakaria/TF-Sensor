@@ -3,7 +3,9 @@
         <!-- If Needed Left and Right Padding in 'md' and 'lg' screen means use container class -->
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading"><h4>Log</h4></div>
+        <div class="panel-heading">
+            <h4>Log</h4>
+        </div>
         <div class="panel-body" id="output" style="height:200px;overflow-y:scroll"></div>
     </div>
 
@@ -99,6 +101,14 @@
                 minorTicks: 5,
                 min: 0,
                 max: 50
+            },
+            androidXYZ: {
+                redFrom: -1, redTo: 1, redColor: '#00FF00',
+                greenFrom: -5, greenTo: 5, greenColor: '#FF0000',
+                yellowFrom: -2.5, yellowTo: 2.5,
+                minorTicks: 5,
+                min: -5,
+                max: 5
             }
         };
 
@@ -143,6 +153,9 @@
                     break;
                 case 'Accelerometer Sensor':
                     label = "Accelerometer";
+                    break;
+                case 'Accelerometer':
+                    label = "x-inertia";
                     break;
                 default:
                     label = "Unknown ";

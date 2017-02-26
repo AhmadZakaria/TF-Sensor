@@ -4,6 +4,7 @@ const uuid = require("uuid");
 const httpError = require("http-errors");
 const http = require("http");
 const TFSensor = require('../../../tf-sensor/lib/TFSensor');
+const TFSensorReading = require('../../../tf-sensor/lib/TFSensorReading');
 const PhoneSensor = require('../../../phone-sensor/lib/PhoneSensor');
 const WebSocket = require('ws');
 const fs = require('fs');
@@ -49,8 +50,8 @@ module.exports = class Sensors {
         }
 
         //Initialise loaded sensors
-        for (var opts in sensorOptions) {
-            let sensor = new typeHardwareSensor(sensorOptions[opts]);
+        for (var opts of sensorOptions) {
+            let sensor = new typeHardwareSensor(opts);
 
             // sensor.onactivate = event => console.log('activated');
             sensor.onchange = event => {
@@ -59,14 +60,13 @@ module.exports = class Sensors {
                 let sensorResponse = {
                     id: sensor.id,
                     type: sensor.Type,
-                    reading: event.reading.value,
-                    timestamp: event.reading.timestamp,
+                    reading: event.value,
+                    timestamp: event.timestamp,
                     unit: sensor.unit
                 };
 
                 wss.broadcast(sensorResponse);
-
-                sensor.lastReading = event.reading;
+                sensor.lastReading = event;
             }
             sensor.start();
             sensors.set(sensor.id, sensor);
@@ -141,24 +141,25 @@ module.exports = class Sensors {
                         sensor = new typeHardwareSensor(request.body);
                         sensorOptions.push(request.body);
                         var json = JSON.stringify(sensorOptions);
-                        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
-                            //console.log("Writing successful (sensors POST" + sensor.id + " )!");
-                        });
+                        // fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
+                        //console.log("Writing successful (sensors POST" + sensor.id + " )!");
+                        // });
 
 
                     } else {
                         sensor = new typePhoneSensor(request.body);
                         sensor.onchange = event => {
+
                             let sensorResponse = {
                                 id: sensor.id,
                                 type: sensor.Type,
-                                reading: event.reading.value,
-                                timestamp: event.reading.timestamp,
+                                reading: event.value,
+                                timestamp: event.timestamp,
                                 unit: sensor.unit
                             };
 
                             wss.broadcast(sensorResponse);
-                            sensor.lastReading = event.reading;
+                            sensor.lastReading = event;
                         };
                     }
 
@@ -249,8 +250,6 @@ module.exports = class Sensors {
                 sensor.stop();
 
                 if (request.body.target != sensor.target) {
-                console.log(request.body.target)
-                console.log(sensor.target)
                     response.format({
                         "default": () => {
                             next(new httpError.NotAcceptable());
@@ -275,16 +274,17 @@ module.exports = class Sensors {
                 } else {
                     sensor = new typePhoneSensor(request.body);
                     sensor.onchange = event => {
+
                         let sensorResponse = {
                             id: sensor.id,
                             type: sensor.Type,
-                            reading: event.reading.value,
-                            timestamp: event.reading.timestamp,
+                            reading: event.value,
+                            timestamp: event.timestamp,
                             unit: sensor.unit
                         };
 
                         wss.broadcast(sensorResponse);
-                        sensor.lastReading = event.reading;
+                        sensor.lastReading = event;
                     };
                 }
 
@@ -335,7 +335,7 @@ module.exports = class Sensors {
         }
 
         let sensorResponse = {
-            reading: sensor.lastReading.value,
+            value: sensor.lastReading.value,
             timestamp: sensor.lastReading.timestamp
         }
         switch (request.method) {
@@ -349,21 +349,15 @@ module.exports = class Sensors {
                     }
                 });
                 break;
-            case "DELETE":
-            case "PUT":
-            case "CONNECT":
-            case "HEAD":
-            case "OPTIONS":
             case "POST":
-                sensor.lastReading.value = parseInt(request.body.lastReading.value);
-                sensor.lastReading.timestamp = parseInt(request.body.lastReading.timestamp);
+                sensor.lastReading = new TFSensorReading(
+                    parseInt(request.body.lastReading.timestamp),
+                    parseInt(request.body.lastReading.value));
                 sensorResponse = {
-                    reading: {
-                        value: sensor.lastReading.value,
-                        timestamp: sensor.lastReading.timestamp
-                    }
-                }
-                sensor.onchange(sensorResponse);
+                    value: sensor.lastReading.value,
+                    timestamp: sensor.lastReading.timestamp
+                };
+                sensor.onchange(sensor.lastReading);
                 response.format({
                     "application/json": () => {
                         response.status(201).send(sensorResponse);
@@ -373,6 +367,11 @@ module.exports = class Sensors {
                     }
                 });
                 break;
+            case "DELETE":
+            case "PUT":
+            case "CONNECT":
+            case "HEAD":
+            case "OPTIONS":
             case "TRACE":
             default:
                 response.set("allow", "GET, POST");
@@ -397,13 +396,14 @@ module.exports = class Sensors {
         switch (request.method) {
 
             case "PUT":
-                let active = (true == request.body.active || 'true' == request.body.active);
+                let active = (true == request.body.active);
 
                 if (active) {
                     sensor.start();
                 } else {
                     sensor.stop();
                 }
+            // no break on purpose. PUT returns new response
             case "GET":
                 let sensorResponse = {
                     id: sensor.id,

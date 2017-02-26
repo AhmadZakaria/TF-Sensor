@@ -20,10 +20,10 @@ else {
     http.globalAgent.options.agent = false;
 }
 
-if (cluster.isMaster && !module.parent.parent) {
-    for (let i = 0; i < cpus; ++i) {
+if (cluster.isMaster && (!module.parent || !module.parent.parent)) {
+    // for (let i = 0; i < cpus; ++i) {
         cluster.fork();
-    }
+    // }
 }
 else {
     launcher(cluster.worker, pkg, config);

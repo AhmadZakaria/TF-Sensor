@@ -49,7 +49,7 @@ module.exports = class Sensor {
   get reading() {
     return this._reading;
   }
-    set lastReading(value) {
+  set lastReading(value) {
     this._lastReading = value;
   }
   get lastReading() {
