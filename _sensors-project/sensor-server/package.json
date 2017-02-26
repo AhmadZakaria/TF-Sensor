@@ -15,7 +15,6 @@
     "express-session": "1.14.2",
     "http-errors": "1.5.1",
     "mkdirp": "0.5.1",
-    "mocha": "^3.2.0",
     "morgan": "1.7.0",
     "serve-favicon": "2.3.2",
     "uuid": "3.0.0",
@@ -26,15 +25,14 @@
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
     "errorhandler": "^1.5.0",
-    "mocha": "*",
-    "nyc": "^10.1.2",
-    "socket.io-client": "^1.7.3"
+    "mocha": "^3.2.0",
+    "nyc": "^10.1.2"
   },
   "main": "index",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/webcc/express4-skeleton.git"
+    "url": "https://github.com/AhmadZakaria/TF-Sensor.git"
   },
   "readmeFilename": "README.md",
   "engines": {
