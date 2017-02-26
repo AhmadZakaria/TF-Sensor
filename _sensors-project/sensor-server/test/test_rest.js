@@ -10,7 +10,6 @@ const NextMock = require("./Mocks/NextMock")
 const TFSensor = require('../../tf-sensor/lib/TFSensor');
 const PhoneSensor = require('../../phone-sensor/lib/PhoneSensor');
 
-const io = require('socket.io-client')
 const WebSocket = require('ws');
 
 const chai = require('chai');
