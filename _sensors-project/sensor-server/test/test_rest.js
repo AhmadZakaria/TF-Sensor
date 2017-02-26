@@ -1,3 +1,4 @@
+"use strict";
 const assert = require('chai').assert;
 const chaiHttp = require('chai-http');
 const Sensors = require("../lib/routes/sensors");
@@ -115,7 +116,7 @@ describe('Sensor Rest Service', function () {
         // });
 
         it('CREATE deactivated TF sensor', function (done) {
-            senOpts = TFSensorOptions.soundSensorOptions;
+            let senOpts = TFSensorOptions.soundSensorOptions;
             senOpts.UID = "asde";
             senOpts.active = false;
             agent
@@ -280,7 +281,7 @@ describe('Sensor Rest Service', function () {
             }
         };
 
-        nowTime = Date.now();
+        let nowTime = Date.now();
         phoneReadingPost.lastReading.value = 70;
         phoneReadingPost.lastReading.timestamp = nowTime;
 
@@ -315,7 +316,7 @@ describe('Sensor Rest Service', function () {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.have.property('value');
-                    r = res.body;
+                    let r = res.body;
                     // console.log(res.body)
                     r.value.should.eq(phoneReadingPost.lastReading.value);
                     r.timestamp.should.eq(phoneReadingPost.lastReading.timestamp);
@@ -522,7 +523,7 @@ describe('Sensor Rest Service', function () {
             }
         };
 
-        nowTime = Date.now();
+        let nowTime = Date.now();
         dataToSend.lastReading.timestamp = nowTime;
 
         it('should receive data via websocket after posting from phone', function (done) {
