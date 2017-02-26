@@ -22,7 +22,7 @@
     "node": ">=6.9.1"
   },
   "scripts": {
-    "postinstall": "cd _sensors-project/generic-sensor-api && npm install && cd ../dummy-sensor && npm install && cd ../tf-sensor && npm install && npm install && cd ../generic-sensor-api/",
+    "postinstall": "cd _sensors-project/generic-sensor-api && npm install && cd ../dummy-sensor && npm install && cd ../tf-sensor && npm install && npm install && cd ../generic-sensor-api/ && cd ../sensor-server && npm install",
     "start": "cd ./_sensors-project/sensor-server/ &&  node index"
   }
 }
