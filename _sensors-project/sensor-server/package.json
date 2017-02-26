@@ -24,7 +24,9 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
+    "coveralls": "^2.11.16",
     "errorhandler": "^1.5.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "nyc": "^10.1.2"
   },
@@ -40,6 +42,7 @@
   },
   "scripts": {
     "start": "node ./index",
-    "test": "nyc  --reporter=lcov mocha -R spec -t 10000  test/*.js &&  nyc report"
+    "test": "nyc  --reporter=lcov mocha -R spec -t 10000  test/*.js &&  nyc report",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
   }
 }
