@@ -1,51 +1,46 @@
 {
-    "name": "seminar-webapps-wot",
-    "version": "0.1.0",
-    "description": "Bonn-IT code examples for the new lessons scripts",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/webcc/seminar-webapps-wot.git"
-    },
-    "author": {
-        "name": "Web Compliance Center",
-        "email": "webcc@fit.fraunhofer.de"
-    },
-    "license": "Apache-2.0",
-    "dependencies": {
-        "express": "4.14.0",
-        "ws": "^1.1.1"
-    },
-    "devDependencies": {
-        "coveralls": "^2.11.16",
-        "chai": "^3.5.0",
-        "chai-http": "^3.0.0",
-        "errorhandler": "^1.5.0",
-        "istanbul": "^0.4.5",
-        "mocha": "^3.2.0",
-        "nyc": "^10.1.2"
-    },
-    "engines": {
-        "node": ">=6.9.1"
-    },
-    "scripts": {
-        "preinstall": "cd _sensors-project/generic-sensor-api && npm install && cd ../phone-sensor && npm install && cd ../dummy-sensor && npm install && cd ../tf-sensor && npm install && npm install && cd ../generic-sensor-api/ && cd ../sensor-server && npm install",
-        "postinstall": "npm link ./_sensors-project/sensor-server/ && npm link ./_sensors-project/phone-sensor/ && npm link ./_sensors-project/tf-sensor/ ",
-        "start": "cd ./_sensors-project/sensor-server/ &&  node index",
-        "test": "cd ./_sensors-project/sensor-server/ && nyc  --reporter=lcov --report-dir=../../coverage mocha -R spec -t 10000  test/*.js ;  nyc report",
-        "test-coverage": "cd ./_sensors-project/sensor-server/ && nyc --reporter=lcov --report-dir=../../coverage npm run test",
-        "report-coverage": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
-    },
-    "nyc": {
-        "include": [
-          "./node_modules/tf-sensor/**/*.js",
-            "./node_modules/phone-sensor/**/*.js",
-            "./node_modules/sensor-server/**/*.js"
-        ],
-        "exclude":[
-          "!**/node_modules/"
-        ],
-        "cache": false,
-        "all": true,
-        "check-coverage": true
-    }
+  "name": "seminar-webapps-wot",
+  "version": "0.1.0",
+  "description": "Bonn-IT code examples for the new lessons scripts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/webcc/seminar-webapps-wot.git"
+  },
+  "author": {
+    "name": "Web Compliance Center",
+    "email": "webcc@fit.fraunhofer.de"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "express": "^4.14.1"
+  },
+  "devDependencies": {
+    "coveralls": "^2.11.16",
+    "mocha": "^3.2.0",
+    "nyc": "^10.1.2"
+  },
+  "engines": {
+    "node": ">=6.9.1"
+  },
+  "scripts": {
+    "preinstall": "cd _sensors-project/generic-sensor-api && npm install && cd ../phone-sensor && npm install && cd ../dummy-sensor && npm install && cd ../tf-sensor && npm install && npm install && cd ../generic-sensor-api/ && cd ../sensor-server && npm install",
+    "postinstall": "npm link ./_sensors-project/sensor-server/ && npm link ./_sensors-project/phone-sensor/ && npm link ./_sensors-project/tf-sensor/ ",
+    "start": "cd ./_sensors-project/sensor-server/ &&  node index",
+    "test": "cd ./_sensors-project/sensor-server/ && nyc  --reporter=lcov --report-dir=../../coverage mocha -R spec -t 10000  test/*.js ;  nyc report",
+    "test-coverage": "cd ./_sensors-project/sensor-server/ && nyc --reporter=lcov --report-dir=../../coverage npm run test",
+    "report-coverage": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+  },
+  "nyc": {
+    "include": [
+      "./node_modules/tf-sensor/**/*.js",
+      "./node_modules/phone-sensor/**/*.js",
+      "./node_modules/sensor-server/**/*.js"
+    ],
+    "exclude": [
+      "!**/node_modules/"
+    ],
+    "cache": false,
+    "all": true,
+    "check-coverage": true
+  }
 }
