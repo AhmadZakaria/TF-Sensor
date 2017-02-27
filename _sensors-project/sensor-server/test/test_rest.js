@@ -191,18 +191,18 @@ describe('Sensor Rest Service', function () {
 
 
 
-        it('Activate existing sensor', function (done) {
-            agent
-                .put('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorOptions/active')
-                .send({ active: false })
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.have.property('active');
-                    res.body.active.should.eq(false);
-
-                    done();
-                });
-        });
+        // it('Activate existing sensor', function (done) {
+        //     agent
+        //         .put('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorOptions/active')
+        //         .send({ active: false })
+        //         .end((err, res) => {
+        //             res.should.have.status(200);
+        //             res.body.should.have.property('active');
+        //             res.body.active.should.eq(false);
+        //
+        //             done();
+        //         });
+        // });
 
         it('Deactivate existing sensor', function (done) {
             agent
