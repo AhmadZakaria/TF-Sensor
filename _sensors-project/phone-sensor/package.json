@@ -13,6 +13,6 @@
   "author": "Ahmad, Thomas, Valentina",
   "license": "MIT",
   "dependencies": {
-
+    "generic-sensor-api": "file:../generic-sensor-api/"
   }
 }

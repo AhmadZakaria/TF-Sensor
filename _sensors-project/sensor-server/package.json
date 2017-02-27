@@ -1,5 +1,5 @@
 {
-  "name": "express4-skeleton",
+  "name": "sensor-server",
   "description": "Web application skeleton for an express.js application",
   "version": "0.3.3",
   "author": {
@@ -10,6 +10,9 @@
     "body-parser": "1.15.2",
     "compression": "1.6.2",
     "dummy-sensor": "file:../dummy-sensor/",
+    "tf-sensor": "file:../tf-sensor/",
+    "phone-sensor": "file:../phone-sensor/",
+    "generic-sensor-api": "file:../generic-sensor-api/",
     "ejs": "2.5.2",
     "express": "4.14.0",
     "express-session": "1.14.2",

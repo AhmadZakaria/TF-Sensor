@@ -1,6 +1,6 @@
 'use strict';
 
-const Sensor = require('../../generic-sensor-api').Sensor;
+const Sensor = require('generic-sensor-api').Sensor;
 const TFSensorReading = require('./TFSensorReading');
 const Tinkerforge = require('tinkerforge');
 

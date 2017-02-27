@@ -1,5 +1,5 @@
 'use strict';
-const SensorReading = require('../../generic-sensor-api').SensorReading;
+const SensorReading = require('generic-sensor-api').SensorReading;
 
 module.exports = class PhoneSensorReading extends SensorReading {
   constructor(timestamp, value) {

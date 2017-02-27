@@ -3,9 +3,9 @@
 const parser = require("body-parser");
 const Sensors = require("./routes/sensors");
 const DefaultRouter = require("./DefaultRouter");
-const TFSensor = require('../../tf-sensor/lib/TFSensor');
-const PhoneSensor = require('../../phone-sensor/lib/PhoneSensor');
-const DummySensor = require('../../dummy-sensor/lib/DummySensor');
+const TFSensor = require('tf-sensor/lib/TFSensor');
+const PhoneSensor = require('phone-sensor/lib/PhoneSensor');
+const DummySensor = require('dummy-sensor/lib/DummySensor');
 
 
 module.exports = class APIRouter extends require("express").Router {

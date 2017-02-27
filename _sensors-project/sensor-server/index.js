@@ -6,7 +6,7 @@ const path = require("path");
 const config = require(path.join(__dirname, "config", "start.json"));
 const pkg = require(path.join(__dirname, "package.json"));
 const debug = require("util").debuglog(pkg.name);
-var app;
+
 process.title = pkg.name;
 config.basedir = __dirname;
 if (config.http.secure) {
@@ -56,8 +56,7 @@ process.on("uncaughtException", function (error) {
 });
 
 function launcher(worker, pkg, config) {
-    app = new (require("./lib/DefaultApp"))(worker, pkg, config);
+    let app = new (require("./lib/DefaultApp"))(worker, pkg, config);
     worker.process.title = `${pkg.name}:${worker.id}`;
     app.start();
 };
-module.exports = app;

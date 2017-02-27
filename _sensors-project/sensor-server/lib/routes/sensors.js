@@ -3,12 +3,12 @@
 const uuid = require("uuid");
 const httpError = require("http-errors");
 const http = require("http");
-const TFSensor = require('../../../tf-sensor/lib/TFSensor');
-const TFSensorReading = require('../../../tf-sensor/lib/TFSensorReading');
-const PhoneSensor = require('../../../phone-sensor/lib/PhoneSensor');
+const TFSensor = require('tf-sensor/lib/TFSensor');
+const TFSensorReading = require('tf-sensor/lib/TFSensorReading');
+const PhoneSensor = require('phone-sensor/lib/PhoneSensor');
 const WebSocket = require('ws');
 const fs = require('fs');
-const SensorState = require('../../../generic-sensor-api/api/SensorState');
+const SensorState = require('generic-sensor-api/api/SensorState');
 
 
 //const TFSensorOptions = require('../../../tf-sensor/lib/TFSensorOptions');
