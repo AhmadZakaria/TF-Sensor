@@ -26,8 +26,8 @@
     "preinstall": "cd _sensors-project/generic-sensor-api && npm install && cd ../phone-sensor && npm install && cd ../dummy-sensor && npm install && cd ../tf-sensor && npm install && npm install && cd ../generic-sensor-api/ && cd ../sensor-server && npm install",
     "postinstall": "npm link ./_sensors-project/sensor-server/ && npm link ./_sensors-project/phone-sensor/ && npm link ./_sensors-project/tf-sensor/ ",
     "start": "cd ./_sensors-project/sensor-server/ &&  node index",
-    "test": "cd ./_sensors-project/sensor-server/ && nyc  --reporter=lcov --report-dir=../../coverage mocha -R spec -t 10000  test/*.js ;  nyc report",
-    "test-coverage": "cd ./_sensors-project/sensor-server/ && nyc --reporter=lcov --report-dir=../../coverage npm run test",
+    "test": "cd ./_sensors-project/sensor-server/ &&  npm run test",
+    "test-coverage": "cd ./_sensors-project/sensor-server/ && nyc --reporter=lcov --report-dir=../../coverage npm run test; nyc report",
     "report-coverage": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "nyc": {
