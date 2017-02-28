@@ -87,12 +87,12 @@ var TFSensorOptions = {
 
     },
     phoneSensorOptions: {
-        "type": "Accelerometer",
-        "frequency": "500",
-        "UID": "androidXYZ",
+        type: "Accelerometer",
+        frequency: "500",
+        UID: "androidXYZ",
         target: "android",
         active: true,
-        "unit": "m/s^2"
+        unit: "m/s^2"
     }
 
 };

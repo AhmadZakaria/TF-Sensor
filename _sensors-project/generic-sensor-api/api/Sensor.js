@@ -93,6 +93,7 @@ module.exports = class Sensor {
     return this.handleStarted();
   }
   stop() {
+    this.state = SensorState.IDLE;
     return this.handleStopped();
   }
 }
