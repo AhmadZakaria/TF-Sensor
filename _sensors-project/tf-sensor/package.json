@@ -10,7 +10,10 @@
     "keywords": [
         "tinkerforge"
     ],
-    "author": "Ahmad, Thomas, Valentina",
+    "author": {
+        "name": "Thomas, Valentina, and Ahmad",
+        "email": "ahmad.zakaria.m@gmail.com"
+    },
     "license": "MIT",
     "dependencies": {
         "tinkerforge": "^2.0.10",

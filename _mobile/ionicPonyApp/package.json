@@ -41,5 +41,5 @@
     "ionic-plugin-keyboard"
   ],
   "cordovaPlatforms": [],
-  "description": "myApp: An Ionic project"
+  "description": "Mobile app for the sensors project"
 }
