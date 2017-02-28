@@ -183,7 +183,6 @@ module.exports = class Sensors {
                     });
                     break;
                 }
-            case "CONNECT":
             case "DELETE":
             case "HEAD":
             case "OPTIONS":
@@ -308,7 +307,6 @@ module.exports = class Sensors {
                     }
                 });
                 break;
-            case "CONNECT":
             case "HEAD":
             case "OPTIONS":
             case "POST":
@@ -369,7 +367,6 @@ module.exports = class Sensors {
                 break;
             case "DELETE":
             case "PUT":
-            case "CONNECT":
             case "HEAD":
             case "OPTIONS":
             case "TRACE":
@@ -420,7 +417,6 @@ module.exports = class Sensors {
                 break;
 
             case "DELETE":
-            case "CONNECT":
             case "HEAD":
             case "OPTIONS":
             case "POST":

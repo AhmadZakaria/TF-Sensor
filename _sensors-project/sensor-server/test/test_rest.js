@@ -113,6 +113,15 @@ describe('Sensor Rest Service', function () {
         //     assert.equal(response.responseData.data["sensors"].length, 2);
         //     assert.equal(response.HTTPCODE, 200);
         // });
+        it('should all return MethodNotAllowed', function (done) {
+            agent
+                .del('/api/sensors')
+                .end((err, res) => {
+                    res.should.have.status(405);
+                    done();
+                });
+        });
+
 
         it('CREATE deactivated TF sensor', function (done) {
             let senOpts = TFSensorOptions.soundSensorOptions;
@@ -126,6 +135,7 @@ describe('Sensor Rest Service', function () {
                     done();
                 });
         });
+
 
         it('CREATE phone sensor', function (done) {
             agent
