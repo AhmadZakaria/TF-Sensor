@@ -113,7 +113,7 @@ describe('Sensor Rest Service', function () {
         //     assert.equal(response.responseData.data["sensors"].length, 2);
         //     assert.equal(response.HTTPCODE, 200);
         // });
-        it('should all return MethodNotAllowed', function (done) {
+        it('should return MethodNotAllowed', function (done) {
             agent
                 .del('/api/sensors')
                 .end((err, res) => {
@@ -405,6 +405,14 @@ describe('Sensor Rest Service', function () {
                     res1.should.have.status(200);
                     res1.body.should.have.property('frequency');
                     assert.equal(res1.body.frequency, 300);
+                    done();
+                });
+        });
+        it('should return MethodNotAllowed', function (done) {
+            agent
+                .head('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID)
+                .end((err, res) => {
+                    res.should.have.status(405);
                     done();
                 });
         });
