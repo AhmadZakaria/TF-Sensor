@@ -27,8 +27,8 @@
     "postinstall": "npm link ./_sensors-project/sensor-server/ && npm link ./_sensors-project/phone-sensor/ && npm link ./_sensors-project/tf-sensor/ ",
     "start": "cd ./_sensors-project/sensor-server/ &&  node index",
     "test": "cd ./_sensors-project/sensor-server/ &&  npm run test",
-    "test-coverage": "cd ./_sensors-project/sensor-server/ && nyc --reporter=lcov --report-dir=../../coverage npm run test; nyc report",
-    "report-coverage": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "test-coverage": "cd ./_sensors-project/sensor-server/ && nyc --reporter=lcov --report-dir=../../server-coverage npm run test; nyc report",
+    "report-coverage": "cat ./server-coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "nyc": {
     "include": [
