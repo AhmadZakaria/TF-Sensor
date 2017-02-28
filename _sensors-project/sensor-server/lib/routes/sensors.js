@@ -85,17 +85,17 @@ module.exports = class Sensors {
 
     }
 
-    clearsensorOptions() {
-        sensorOptions = [];
-        var json = JSON.stringify(sensorOptions);
-        fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
-            //console.log("Writing successful (sensors POST" + sensor.id + " )!");
-        });
-    }
+    // clearsensorOptions() {
+    //     sensorOptions = [];
+    //     var json = JSON.stringify(sensorOptions);
+    //     fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
+    //         //console.log("Writing successful (sensors POST" + sensor.id + " )!");
+    //     });
+    // }
 
-    clearSensors() {
-        sensors = new Map();
-    }
+    // clearSensors() {
+    //     sensors = new Map();
+    // }
 
 
     sensors(request, response, next) {
@@ -124,11 +124,11 @@ module.exports = class Sensors {
                         "application/json": () => {
                             response.status(409).json(
                                 {
-                                    "status": "UID already exists"
+                                    "error": "UID already exists"
                                 });
                         },
                         "default": () => {
-                            next(new httpError.NotAcceptable());
+                            next(new httpError.Conflict());
                         }
                     });
                     break;
@@ -326,7 +326,7 @@ module.exports = class Sensors {
                     response.status(404).type("application/json").send({ "error": "Sensor doesn't exist!" });
                 },
                 "default": () => {
-                    next(new httpError.NotAcceptable());
+                    next(new httpError.NotFound());
                 }
             });
             return;

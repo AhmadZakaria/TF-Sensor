@@ -60,6 +60,15 @@ describe('Sensor Rest Service', function () {
                     done();
                 });
         });
+        it('should return NotAcceptable', (done) => {
+            agent
+                .get('/api/sensors')
+                .set("accept", "application/pdf")
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
 
         // it('GET 0 Sensors', function () {
 
@@ -136,6 +145,49 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
+        it('CREATE duplicate TF sensor', function (done) {
+            let senOpts = TFSensorOptions.soundSensorOptions;
+            senOpts.UID = "asde";
+            senOpts.active = false;
+            agent
+                .post('/api/sensors')
+                .send(senOpts)
+                .end((err, res) => {
+                    res.should.have.status(409);
+                    res.body.should.have.property('error');
+                    res.body.error.should.equal("UID already exists");
+                    done();
+                });
+        });
+
+        it('CREATE duplicate TF sensor, with unknown accept type', function (done) {
+            let senOpts = TFSensorOptions.soundSensorOptions;
+            senOpts.UID = "asde";
+            senOpts.active = false;
+            agent
+                .post('/api/sensors')
+                .set("accept", "application/pdf")
+                .send(senOpts)
+                .end((err, res) => {
+                    res.should.have.status(409);
+                    done();
+                });
+        });
+
+        it('CREATE new TF sensor, with unknown accept type', function (done) {
+            let senOpts = TFSensorOptions.soundSensorOptions;
+            senOpts.UID = "asde2";
+            senOpts.active = false;
+            agent
+                .post('/api/sensors')
+                .set("accept", "application/pdf")
+                .send(senOpts)
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
 
         it('CREATE phone sensor', function (done) {
             agent
@@ -169,6 +221,16 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
+        it('DELETE an existing sensor, with wrong accept type', function (done) {
+            agent
+                .del('/api/sensors/' + "asde2")
+                .set("accept", "application/pdf")
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
         it('DELETE a non-existing sensor', function (done) {
             agent
                 .del('/api/sensors/' + "somerandomestringthatisreallynotarealsensorid")
@@ -192,6 +254,17 @@ describe('Sensor Rest Service', function () {
         it('should return 404', function (done) {
             agent
                 .post('/api/sensors/' + "somerandomestringthatisreallynotarealsensorid" + 'androidXYZ/sensorReadings/latest')
+                .send(TFSensorOptions.phoneSensorOptions)
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    done();
+                });
+        });
+
+        it('should return 404', function (done) {
+            agent
+                .post('/api/sensors/' + "somerandomestringthatisreallynotarealsensorid" + 'androidXYZ/sensorReadings/latest')
+                .set("accept", "application/pdf")
                 .send(TFSensorOptions.phoneSensorOptions)
                 .end((err, res) => {
                     res.should.have.status(404);
@@ -255,6 +328,17 @@ describe('Sensor Rest Service', function () {
                     res.should.have.status(200);
                     res.body.should.have.property('active');
                     res.body.active.should.eq(true);
+
+                    done();
+                });
+        });
+
+        it('GET sensor active status, with wrong accept status', function (done) {
+            agent
+                .get('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorOptions/active')
+                .set("accept", "application/pdf")
+                .end((err, res) => {
+                    res.should.have.status(406);
 
                     done();
                 });
@@ -365,7 +449,7 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
-        it('PUT change tf-sensor frequency', (done) => {
+        it('Change tf-sensor frequency', (done) => {
             let newOpts = TFSensorOptions.humiditySensorOptions;
             newOpts.frequency = '600';
 
@@ -380,13 +464,41 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
+        it('Change tf-sensor frequency with wrong accept type', (done) => {
+            let newOpts = TFSensorOptions.humiditySensorOptions;
+            newOpts.frequency = '300';
+
+            agent
+                .put('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
+                .set("accept", "application/pdf")
+                .send(newOpts)
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
+        it('Try to change sensor target', (done) => {
+            let newOpts = TFSensorOptions.humiditySensorOptions;
+            newOpts.target = 'somethingelse';
+
+            agent
+                .put('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
+                .set("content-type", "application/json")
+                .send(newOpts)
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
         it('GET changed tf-sensor frequency', (done) => {
             agent
                 .get('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
                 .end((err1, res1) => {
                     res1.should.have.status(200);
                     res1.body.should.have.property('frequency');
-                    assert.equal(res1.body.frequency, 600);
+                    assert.equal(res1.body.frequency, 300);
                     done();
                 });
         });
@@ -416,6 +528,16 @@ describe('Sensor Rest Service', function () {
                     done();
                 });
         });
+        it('should return NotAcceptable', function (done) {
+            agent
+                .get('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID)
+                .set("accept", "application/pdf")
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
         it('should return MethodNotAllowed', function (done) {
             agent
                 .head('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID)
