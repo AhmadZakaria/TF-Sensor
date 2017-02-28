@@ -573,13 +573,15 @@ describe('Sensor Rest Service', function () {
             });
 
             agent
-                .post('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
+                .post('/api/sensors/' + TFSensorOptions.ambientLightSensorOptions.UID + '/sensorReadings/latest')
                 .send(dataToSend)
                 .end((err, res) => {
                     expect(err).to.be.null;
                     res.should.have.status(201);
                 });
         });
+
+
 
     });
 
