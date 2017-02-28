@@ -347,7 +347,7 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
-        it('PUT change sensor frequency', (done) => {
+        it('PUT change tf-sensor frequency', (done) => {
             let newOpts = TFSensorOptions.humiditySensorOptions;
             newOpts.frequency = '600';
 
@@ -362,13 +362,39 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
-        it('GET changed sensor frequency', (done) => {
+        it('GET changed tf-sensor frequency', (done) => {
             agent
                 .get('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
                 .end((err1, res1) => {
                     res1.should.have.status(200);
                     res1.body.should.have.property('frequency');
-                    assert.equal(res1.body.frequency500);
+                    assert.equal(res1.body.frequency, 600);
+                    done();
+                });
+        });
+
+        it('PUT change phone-sensor frequency', (done) => {
+            let newOpts = TFSensorOptions.phoneSensorOptions;
+            newOpts.frequency = '300';
+
+            agent
+                .put('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID)
+                .set("content-type", "application/json")
+                .send(newOpts)
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    res.should.have.status(200);
+                    done();
+                });
+        });
+
+        it('GET changed phone-sensor frequency', (done) => {
+            agent
+                .get('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID)
+                .end((err1, res1) => {
+                    res1.should.have.status(200);
+                    res1.body.should.have.property('frequency');
+                    assert.equal(res1.body.frequency, 300);
                     done();
                 });
         });
