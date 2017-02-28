@@ -580,6 +580,16 @@ describe('Sensor Rest Service', function () {
         it('should return 404', function (done) {
             agent
                 .get('/dashboard')
+                .set("accept", "application/json")
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    done();
+                });
+        });
+
+        it('should return 404', function (done) {
+            agent
+                .get('/dashboard')
                 .end((err, res) => {
                     res.should.have.status(404);
                     done();
@@ -593,6 +603,26 @@ describe('Sensor Rest Service', function () {
                     res.should.have.status(500);
                     done();
                 });
+        });
+
+        it('should return error', function (done) {
+            agent
+                .get('/error.html')
+                .set("accept", "text/html")
+                .end((err, res) => {
+                    res.should.have.status(500);
+                    done();
+                });
+        });
+
+        it('should return error', function (done) {
+            agent
+                .get('/error.html')
+                .set("accept", "application/xhtml+xml")
+                    .end((err, res) => {
+                        res.should.have.status(500);
+                        done();
+                    });
         });
 
         describe('Test unallowed verbs', function () {
