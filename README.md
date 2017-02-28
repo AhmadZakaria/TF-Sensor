@@ -1,5 +1,6 @@
 # Sensors Project
 This project provides a web interface/dashboard for a variety of Tinkerforge sensors, as well as other mobile devices. The project was developed as a part of "Development of modern web-based distributed application" lab at the Bonn-Aachen International Center for Information Technology (b-it).
+
 [![Build Status](https://travis-ci.org/AhmadZakaria/TF-Sensor.svg?branch=master)](https://travis-ci.org/AhmadZakaria/TF-Sensor) [![Coverage Status](https://coveralls.io/repos/github/AhmadZakaria/TF-Sensor/badge.svg?branch=master)](https://coveralls.io/github/AhmadZakaria/TF-Sensor?branch=master)
 
 ## Getting Started
