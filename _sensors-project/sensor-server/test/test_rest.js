@@ -342,6 +342,14 @@ describe('Sensor Rest Service', function () {
                     done();
                 });
         });
+        it('should return MethodNotAllowed', function (done) {
+            agent
+                .del('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
+                .end((err, res) => {
+                    res.should.have.status(405);
+                    done();
+                });
+        });
     });
 
     describe('Sensor', function () {
