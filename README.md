@@ -37,5 +37,7 @@ This project is licensed under the WebCC Public License - see the [LICENSE.md](L
 
 ## Acknowledgments
 Special thanks to:
-* **Philip Ackermann** - [philipackermann.de](http://philipackermann.de/)
 * **Dr. Carlos A. Velasco** - [WebCC](https://www.fit.fraunhofer.de/en/fb/ucc/webcc.html)
+* **Philip Ackermann** - [philipackermann.de](http://philipackermann.de/)
+* **Dr. Yehya Mohamad** - [WebCC](https://www.fit.fraunhofer.de/en/fb/ucc/webcc.html)
+* **Evangelos Vlachogiannis** - [WebCC](https://www.fit.fraunhofer.de/en/fb/ucc/webcc.html)
