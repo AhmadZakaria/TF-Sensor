@@ -518,6 +518,27 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
+
+        it('SEND readings from phone sensor after frequency change', function (done) {
+            let nowTime = Date.now();
+            let phoneReadingPost = {
+                lastReading: {
+                    value: 90,
+                    timestamp: nowTime
+                }
+            }
+            agent
+                .post('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
+                // .set("content-type", "application/json")
+                .send(phoneReadingPost)
+                .end((err, res) => {
+                    // if (err)
+                    // console.log(res.body)
+                    res.should.have.status(201);
+                    done();
+                });
+        });
+
         it('GET changed phone-sensor frequency', (done) => {
             agent
                 .get('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID)
@@ -619,10 +640,10 @@ describe('Sensor Rest Service', function () {
             agent
                 .get('/error.html')
                 .set("accept", "application/xhtml+xml")
-                    .end((err, res) => {
-                        res.should.have.status(500);
-                        done();
-                    });
+                .end((err, res) => {
+                    res.should.have.status(500);
+                    done();
+                });
         });
 
         describe('Test unallowed verbs', function () {
@@ -673,6 +694,14 @@ describe('Sensor Rest Service', function () {
                     .post('/dashboard.html')
                     .end((err, res) => {
                         res.should.have.status(405);
+                        done();
+                    });
+            });
+            it('should return 404', function (done) {
+                agent
+                    .post('/api/klsjdflsjf/wqofq')
+                    .end((err, res) => {
+                        res.should.have.status(404);
                         done();
                     });
             });
