@@ -184,7 +184,9 @@
             google.visualization.events.addListener(linechart, 'error', errorHandler);
             google.visualization.events.addListener(linechart, 'ready', () => lockMap.set(_id, true));
 
-
+            if (options_gauge[_id] == undefined) {
+                options_gauge[_id] = options_gauge.androidXYZ;
+            }
             gaugechart.draw(data_line, options_gauge[_id]);
 
         }
@@ -226,9 +228,9 @@
 
             if (lockMap.get(data.id)) {//check if the chart is ready
                 let now = new Date();
-                let newData = dataMap.get(data.id).
-                    filter(i => (now - i[0]) < 20000).
-                    map(i => [-1 * (now - i[0]) / 1000, i[1]]);
+                dataMap.set(data.id, dataMap.get(data.id)
+                    .filter(i => (now - i[0]) < 20000));
+                let newData = dataMap.get(data.id).map(i => [-1 * (now - i[0]) / 1000, i[1]]);
                 // newData.unshift(["Timestamp", "Units"]);
 
                 let data1 = new google.visualization.DataTable();

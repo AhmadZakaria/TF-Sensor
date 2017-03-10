@@ -6,7 +6,8 @@ import {
   NavController
 } from 'ionic-angular';
 import {
-  AlertController
+  AlertController,
+  Platform
 } from 'ionic-angular';
 
 import {
@@ -17,6 +18,8 @@ import {
   Headers
 } from '@angular/http';
 import 'rxjs/add/operator/map';
+import { Device } from 'ionic-native';
+
 
 @Component({
   selector: 'page-about',
@@ -27,12 +30,18 @@ export class AboutPage {
   img_pony = "https://www.transparenttextures.com/patterns/asfalt-light.png";
   handle = undefined;
   started = false;
-  posts = ""
   serverIP = undefined;
+  connectionStatus = "Disconnected";
+  statusColor = "light";
+  sensorStatus = "radio-button-off";
+  deviceID = undefined;
 
-  constructor(public navCtrl: NavController, public alertCtrl: AlertController, public http: Http) {
+  constructor(public navCtrl: NavController, public alertCtrl: AlertController, public http: Http, platform: Platform) {
     this.http.get('config.json').map(res => res.json()).subscribe(data => {
       this.serverIP = data.serverIP;
+    });
+    platform.ready().then(() => {
+      this.deviceID = "AccX-" + Device.uuid;
     });
   }
 
@@ -41,7 +50,7 @@ export class AboutPage {
     var post_data = {
       "type": "Accelerometer",
       "frequency": "500",
-      "UID": "androidXYZ",
+      "UID": this.deviceID,
       "target": "android",
       "active": "true",
       "unit": "m/s^2"
@@ -61,11 +70,17 @@ export class AboutPage {
       })
       .map(response => response.json())
       .subscribe(
-        response => this.posts = response,
-        (err) => {
-          console.log('Errorr: ' + err)
-        },
-        () => console.log('Something Complete')
+      response => {
+        this.connectionStatus = "Connected";
+        this.statusColor = "secondary";
+      },
+      (err) => {
+        console.log('Errorr: ' + err);
+        this.connectionStatus = "Error";
+        this.statusColor = "danger";
+
+      },
+      () => console.log('Something Complete')
       );
   }
 
@@ -73,14 +88,18 @@ export class AboutPage {
     event.preventDefault();
 
     if (this.started) {
-      this.img_pony = "http://mylittlepony.hasbro.com/images/spring2016/ponies/char_rarity.png";
+      this.img_pony = "char_rarity.png";
       this.started = false;
+      this.sensorStatus = "radio-button-off"
+
       clearInterval(this.handle);
       console.log("Stopping!");
     } else {
-      this.img_pony = "http://mylittlepony.hasbro.com/images/spring2016/ponies/char_fluttershy.png";
+      this.img_pony = "char_fluttershy.png";
 
       this.started = true;
+      this.sensorStatus = "radio-button-on"
+
       this.handle = setInterval(() => {
         // Get the device current acceleration
         DeviceMotion.getCurrentAcceleration().then(
@@ -113,16 +132,16 @@ export class AboutPage {
 
 
     this.http
-      .post('http://' + this.serverIP + ':8080/api/sensors/androidXYZ/sensorReadings/latest', body, {
+      .post('http://' + this.serverIP + ':8080/api/sensors/' + this.deviceID + '/sensorReadings/latest', body, {
         headers: headers
       })
       .map(response => response.json())
       .subscribe(
-        response => this.posts = response,
-        (err) => {
-          console.log('Errorr: ' + err)
-        },
-        () => console.log('Something Complete')
+      response => { },
+      (err) => {
+        console.log('Errorr: ' + err)
+      },
+      () => console.log('Something Complete')
       );
 
   }

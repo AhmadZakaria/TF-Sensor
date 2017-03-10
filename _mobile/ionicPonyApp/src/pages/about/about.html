@@ -1,23 +1,45 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      SensorApp
+      Sensor Mobile App
     </ion-title>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-
-  <ion-label color="primary" stacked>Server Address</ion-label>
-  <ion-input type="text" placeholder="192.168.1.1"></ion-input>
-
-
-
+<ion-content class="superfill">
   <ion-card>
-    <ion-card-content>
-      <div class="item item-divider">
-        Device Motion information!
+    <ion-card-header>
+      Device Motion information!
+    </ion-card-header>
+
+    <ion-list>
+      <button ion-item>
+      <ion-icon name="phone-landscape" item-left></ion-icon>
+      X = {{acc}}
+    </button>
+
+      <div text-center>
+        <button ion-button item-left icon-left color="dark" (click)="registerPonySensor($event)">
+        <ion-icon name="wifi"></ion-icon>
+        Register Sensor
+        </button>
+        <button ion-button item-right icon-left color="blue" (click)="clickedAlert($event)">
+        <ion-icon name="{{sensorStatus}}"></ion-icon>
+        Toggle Sensor
+        </button>
       </div>
+      <hr>
+      <ion-item>
+        Server Address: {{serverIP}}
+        <ion-badge color="{{statusColor}}" item-right>{{connectionStatus}}</ion-badge>
+      </ion-item>
+
+    </ion-list>
+
+
+
+    <!--<ion-card-content>
+
       <div class="item item-text-wrap">
         <ul class="list">
           <li class="item">
@@ -25,12 +47,9 @@
           </li>
         </ul>
       </div>
-      <button ion-button color="dark" (click)="registerPonySensor($event)">Register Sensor</button>
-      <button ion-button color="blue" (click)="clickedAlert($event)">Toggle Sensor</button>
 
-    </ion-card-content>
+    </ion-card-content>-->
   </ion-card>
-  <p>{{posts}}</p>
   <img src="{{img_pony}}" style="border : solid transparent;width:70%;height:70%;" class="center" alt="" />
 
 </ion-content>
