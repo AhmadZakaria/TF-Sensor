@@ -121,7 +121,9 @@
             //init sensor, and data series            
             sensors[_id] = {
                 id: _id,
-                data: []
+                data: [],
+                unit: sensorResponse.unit,
+                type: sensorResponse.type
             };
 
 
@@ -207,7 +209,7 @@
         function init() {
             output = document.getElementById("output");
             initWebSocket();
-
+            setInterval(timestep, 800);
         }
 
         function errorHandler(error) {
@@ -218,27 +220,29 @@
         }
 
         function timestep() {
-            for (let devID of sensors.keys) {
+            for (let idx in sensors) {
+                let devID = sensors[idx].id;
                 if (sensors[devID].lock) {//check if the chart is ready
                     let now = new Date();
+
+                    // remove any reading older than 20 seconds
                     sensors[devID].data = sensors[devID].data
                         .filter(i => (now - i[0]) < 20000);
 
+                    // plot readings' timestamps relative to now() 
                     let newData = sensors[devID].data.map(i => [-1 * (now - i[0]) / 1000, i[1]]);
-                    // newData.unshift(["Timestamp", "Units"]);
 
                     let data1 = new google.visualization.DataTable();
                     data1.addColumn('number', 'Seconds ago');
-                    data1.addColumn('number', data.unit);
+                    data1.addColumn('number', sensors[devID].unit);
                     data1.addRows(newData);
-                    let
 
                     var formatter = new google.visualization.NumberFormat({ suffix: ' secs' });
-                    var unitFormatter = new google.visualization.NumberFormat({ suffix: data.unit });
+                    var unitFormatter = new google.visualization.NumberFormat({ suffix: sensors[devID].unit });
                     formatter.format(data1, 0); // Apply formatter to first column
                     unitFormatter.format(data1, 1); // Apply formatter to second column
 
-                    options_line.vAxis = { title: data.unit };
+                    options_line.vAxis = { title: sensors[devID].unit };
 
                     let g_chart = sensors[devID].gaugeChart;
                     let l_chart = sensors[devID].lineChart;
@@ -255,30 +259,6 @@
 
             sensors[data.id].data.push([new Date(data.timestamp), data.reading]);
 
-            if (sensors[data.id].lock) {//check if the chart is ready
-                let now = new Date();
-                sensors[data.id].data = sensors[data.id].data
-                    .filter(i => (now - i[0]) < 20000);
-                let newData = sensors[data.id].data.map(i => [-1 * (now - i[0]) / 1000, i[1]]);
-                // newData.unshift(["Timestamp", "Units"]);
-
-                let data1 = new google.visualization.DataTable();
-                data1.addColumn('number', 'Seconds ago');
-                data1.addColumn('number', data.unit);
-                data1.addRows(newData);
-
-                var formatter = new google.visualization.NumberFormat({ suffix: ' secs' });
-                var unitFormatter = new google.visualization.NumberFormat({ suffix: data.unit });
-                formatter.format(data1, 0); // Apply formatter to first column
-                unitFormatter.format(data1, 1); // Apply formatter to second column
-
-                options_line.vAxis = { title: data.unit };
-
-                let g_chart = sensors[data.id].gaugeChart;
-                let l_chart = sensors[data.id].lineChart;
-                g_chart.draw(sensors[data.id].gaugeData, options_gauge[data.id]);
-                l_chart.draw(data1, options_line);
-            }
         }
 
         function initWebSocket() {
