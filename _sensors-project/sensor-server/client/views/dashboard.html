@@ -16,13 +16,13 @@
         });
         google.charts.setOnLoadCallback(init);
 
+        let sensors = {};
+
 
         let dataMap = new Map();
-        let divMap = new Map();
-        let lineDataMap = new Map();
-        let gaugeDataMap = new Map();
-        let lineChartMap = new Map();
-        let gaugeChartMap = new Map();
+        // let divMap = new Map();
+        // let lineChartMap = new Map();
+        // let gaugeChartMap = new Map();
         let lockMap = new Map();
 
         let options_line = {
@@ -118,9 +118,14 @@
             let _id = sensorResponse.id;
             let _type = sensorResponse.type;
 
-            //init data series
-            if (dataMap.get(_id) == undefined)
-                dataMap.set(_id, []);
+            //init sensor, and data series            
+            sensors[_id] = {
+                id: _id,
+                data: []
+            };
+
+
+
 
             let gaugeID = "sensor_" + _id + "_gauge";
             let historyID = "sensor_" + _id + "_history";
@@ -163,9 +168,10 @@
 
             let data_gauge = google.visualization.arrayToDataTable([
                 ['Label', 'Value'],
-                [label, 80],
+                [label, 0],
             ]);
-            lockMap.set(_id, true);
+            sensors[_id].lock = true;;
+
 
             let data_line = new google.visualization.DataTable();
             data_line.addColumn('datetime', 'Timestamp');
@@ -175,14 +181,14 @@
 
             let gaugechart = new google.visualization.Gauge(document.getElementById(gaugeID));
 
-            gaugeDataMap.set(_id, data_gauge)
-            lineDataMap.set(_id, data_line);
-            gaugeChartMap.set(_id, gaugechart)
-            lineChartMap.set(_id, linechart);
+            sensors[_id].gaugeData = data_gauge;
+            sensors[_id].lineData = data_line;
+            sensors[_id].gaugeChart = gaugechart;
+            sensors[_id].lineChart = linechart;
 
             google.visualization.events.addListener(gaugechart, 'error', errorHandler);
             google.visualization.events.addListener(linechart, 'error', errorHandler);
-            google.visualization.events.addListener(linechart, 'ready', () => lockMap.set(_id, true));
+            google.visualization.events.addListener(linechart, 'ready', () => sensors[_id].lock = true);
 
             if (options_gauge[_id] == undefined) {
                 options_gauge[_id] = options_gauge.androidXYZ;
@@ -211,26 +217,49 @@
             google.visualization.errors.addError(output, error.message, error.detailedMessage, error.options);
         }
 
+        function timestep() {
+            for (let devID of sensors.keys) {
+                if (sensors[devID].lock) {//check if the chart is ready
+                    let now = new Date();
+                    sensors[devID].data = sensors[devID].data
+                        .filter(i => (now - i[0]) < 20000);
+
+                    let newData = sensors[devID].data.map(i => [-1 * (now - i[0]) / 1000, i[1]]);
+                    // newData.unshift(["Timestamp", "Units"]);
+
+                    let data1 = new google.visualization.DataTable();
+                    data1.addColumn('number', 'Seconds ago');
+                    data1.addColumn('number', data.unit);
+                    data1.addRows(newData);
+                    let
+
+                    var formatter = new google.visualization.NumberFormat({ suffix: ' secs' });
+                    var unitFormatter = new google.visualization.NumberFormat({ suffix: data.unit });
+                    formatter.format(data1, 0); // Apply formatter to first column
+                    unitFormatter.format(data1, 1); // Apply formatter to second column
+
+                    options_line.vAxis = { title: data.unit };
+
+                    let g_chart = sensors[devID].gaugeChart;
+                    let l_chart = sensors[devID].lineChart;
+
+
+                    g_chart.draw(sensors[devID].gaugeData, options_gauge[devID]);
+                    l_chart.draw(data1, options_line);
+                }
+            }
+        }
+
         function updateChart(data) {
-            gaugeDataMap.get(data.id).setValue(0, 1, data.reading);
-            // lineDataMap.get(data.id).addRows([
-            //     [new Date(data.timestamp), data.reading]
-            // ]);
+            sensors[data.id].gaugeData.setValue(0, 1, data.reading);
 
-            dataMap.get(data.id).push([new Date(data.timestamp), data.reading]);
+            sensors[data.id].data.push([new Date(data.timestamp), data.reading]);
 
-            // let data_line = new google.visualization.DataTable();
-            // data_line.addColumn('datetime', 'Timestamp');
-            // data_line.addColumn('number', label_unit);
-
-
-
-
-            if (lockMap.get(data.id)) {//check if the chart is ready
+            if (sensors[data.id].lock) {//check if the chart is ready
                 let now = new Date();
-                dataMap.set(data.id, dataMap.get(data.id)
-                    .filter(i => (now - i[0]) < 20000));
-                let newData = dataMap.get(data.id).map(i => [-1 * (now - i[0]) / 1000, i[1]]);
+                sensors[data.id].data = sensors[data.id].data
+                    .filter(i => (now - i[0]) < 20000);
+                let newData = sensors[data.id].data.map(i => [-1 * (now - i[0]) / 1000, i[1]]);
                 // newData.unshift(["Timestamp", "Units"]);
 
                 let data1 = new google.visualization.DataTable();
@@ -245,9 +274,9 @@
 
                 options_line.vAxis = { title: data.unit };
 
-                let g_chart = gaugeChartMap.get(data.id);
-                let l_chart = lineChartMap.get(data.id);
-                g_chart.draw(gaugeDataMap.get(data.id), options_gauge[data.id]);
+                let g_chart = sensors[data.id].gaugeChart;
+                let l_chart = sensors[data.id].lineChart;
+                g_chart.draw(sensors[data.id].gaugeData, options_gauge[data.id]);
                 l_chart.draw(data1, options_line);
             }
         }
@@ -280,9 +309,8 @@
         function onMessage(evt) {
             dataRec = evt.data;
             dataRec_parsed = JSON.parse(evt.data);
-            if (dataMap.get(dataRec_parsed.id) == undefined) {
-                // dataMap.set(dataRec.id, []);
-                console.log("Not found! ");
+            if (sensors[dataRec_parsed.id] == undefined) {
+                console.log("New sensor. Initializing! ");
                 initSensor(dataRec_parsed);
             }
 
