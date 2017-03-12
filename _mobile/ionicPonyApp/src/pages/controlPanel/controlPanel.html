@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Sensor Mobile App
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="superfill">
+  <ion-card>
+    <ion-card-header>
+      Device Motion information!
+    </ion-card-header>
+
+    <ion-list>
+      <button ion-item>
+      <ion-icon name="phone-landscape" item-left></ion-icon>
+      X = {{acc}}
+    </button>
+
+      <div text-center>
+        <button ion-button item-left icon-left color="dark" (click)="registerPonySensor($event)">
+        <ion-icon name="wifi"></ion-icon>
+        Register Sensor
+        </button>
+        <button ion-button item-right icon-left color="blue" (click)="clickedAlert($event)">
+        <ion-icon name="{{sensorStatus}}"></ion-icon>
+        Toggle Sensor
+        </button>
+      </div>
+      <hr>
+      <ion-item>
+        Server Address: {{serverIP}}
+        <ion-badge color="{{statusColor}}" item-right>{{connectionStatus}}</ion-badge>
+      </ion-item>
+
+    </ion-list>
+  </ion-card>
+  <button ion-button item-right block color="blue" (click)="opendash($event)">
+        Open dashboard
+        </button>
+  <img src="{{img_pony}}" style="border : solid transparent;width:70%;height:70%;" class="center" alt="" />
+
+</ion-content>
