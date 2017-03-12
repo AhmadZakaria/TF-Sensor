@@ -27,7 +27,7 @@ import { Device } from 'ionic-native';
 })
 export class AboutPage {
   acc = undefined;
-  img_pony = "https://www.transparenttextures.com/patterns/asfalt-light.png";
+  img_pony = "asfalt-light.png";
   handle = undefined;
   started = false;
   serverIP = undefined;
@@ -55,9 +55,7 @@ export class AboutPage {
       "active": "true",
       "unit": "m/s^2"
     };
-    // this.http.get('https://www.reddit.com/r/gifs/new/.json?limit=10').map(res => res.json()).subscribe(data => {
-    //   this.posts = data.data.children;
-    // });
+
     var body = JSON.stringify(post_data);
     var headers = new Headers();
     headers.append('Content-Type', 'application/json');
