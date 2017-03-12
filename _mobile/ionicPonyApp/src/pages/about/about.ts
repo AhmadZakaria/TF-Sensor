@@ -19,6 +19,7 @@ import {
 } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { Device } from 'ionic-native';
+import { InAppBrowser } from 'ionic-native';
 
 
 @Component({
@@ -115,6 +116,13 @@ export class AboutPage {
       }, 1000);
       console.log("Starting!");
     }
+
+  }
+
+  opendash(event) {
+    let dashURL = 'http://' + this.serverIP + ':8080/dashboard.html';
+    var ref = new InAppBrowser(dashURL, '_self');
+    ref.show();
 
   }
 
