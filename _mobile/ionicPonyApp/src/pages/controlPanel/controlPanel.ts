@@ -27,7 +27,7 @@ import { InAppBrowser } from 'ionic-native';
   templateUrl: 'controlPanel.html'
 })
 export class ControlPanel {
-  acc = "0.0";
+  acc = 0.0;
   img_pony = "asfalt-light.png";
   handle = undefined;
   started = false;
