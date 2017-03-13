@@ -47,8 +47,6 @@ else {
 let server = app.start();
 var agent = chai.request.agent(server);
 
-// let server = "http://0.0.0.0:8080";
-// console.log(app);
 describe('Sensor Rest Service', function () {
     describe('Sensors', function () {
 
@@ -70,58 +68,6 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
-        // it('GET 0 Sensors', function () {
-
-        //     let sensors = new Sensors(DummySensor, DummySensor);
-
-        //     var request = new RequestMock("GET");
-        //     var response = new ResponseMock();
-
-
-        //     sensors.sensors(request, response, () => { });
-
-        //     response.formatData["application/json"]();
-
-        //     assert.equal(response.responseData.data["sensors"].length, 0);
-        // });
-        // it('GET 1 sensor', function () {
-
-        //     let sensors = new Sensors(DummySensor, DummySensor);
-
-        //     var request = new RequestMock("POST");
-        //     request.body = TFSensorOptions.temperatureSensorOptions;
-
-        //     var response = new ResponseMock();
-
-        //     sensors.sensors(request, response, () => { });
-
-        //     response.formatData["application/json"]();
-
-        //     assert.equal(response.responseData.data[0].id, request.body.UID);
-        //     assert.equal(response.HTTPCODE, 201);
-        // });
-        // it('GET 2 sensors', function () {
-
-        //     let sensors = new Sensors(DummySensor, DummySensor);
-
-        //     var request = new RequestMock("POST");
-        //     request.body = TFSensorOptions.ambientLightSensorOptions;
-
-        //     var response = new ResponseMock();
-
-        //     sensors.sensors(request, response, () => { });
-
-        //     request = new RequestMock("GET");
-        //     response = new ResponseMock();
-
-
-        //     sensors.sensors(request, response, () => { });
-
-        //     response.formatData["application/json"]();
-
-        //     assert.equal(response.responseData.data["sensors"].length, 2);
-        //     assert.equal(response.HTTPCODE, 200);
-        // });
         it('should return MethodNotAllowed', function (done) {
             agent
                 .del('/api/sensors')
@@ -348,10 +294,7 @@ describe('Sensor Rest Service', function () {
             agent
                 .del('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorOptions/active')
                 .end((err, res) => {
-                    // console.log(res)
                     res.should.have.status(405);
-                    // res.body.should.be.a('array');
-                    // res.body.length.should.be.eql(0);
                     done();
                 });
         });
@@ -381,11 +324,8 @@ describe('Sensor Rest Service', function () {
         it('SEND readings from phone sensor', function (done) {
             agent
                 .post('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
-                // .set("content-type", "application/json")
                 .send(phoneReadingPost)
                 .end((err, res) => {
-                    // if (err)
-                    // console.log(res.body)
                     res.should.have.status(201);
                     done();
                 });
@@ -410,7 +350,6 @@ describe('Sensor Rest Service', function () {
                     res.should.have.status(200);
                     res.body.should.have.property('value');
                     let r = res.body;
-                    // console.log(res.body)
                     r.value.should.eq(phoneReadingPost.lastReading.value);
                     r.timestamp.should.eq(phoneReadingPost.lastReading.timestamp);
                     done();
@@ -529,11 +468,8 @@ describe('Sensor Rest Service', function () {
             }
             agent
                 .post('/api/sensors/' + TFSensorOptions.phoneSensorOptions.UID + '/sensorReadings/latest')
-                // .set("content-type", "application/json")
                 .send(phoneReadingPost)
                 .end((err, res) => {
-                    // if (err)
-                    // console.log(res.body)
                     res.should.have.status(201);
                     done();
                 });
@@ -721,13 +657,11 @@ describe('Sensor Rest Service', function () {
             });
 
             ws.on('open', function open() {
-                // console.log('connected');
                 connected = true;
                 done();
             });
 
             ws.on('close', function close() {
-                // console.log('disconnected');
             });
 
 
@@ -736,7 +670,6 @@ describe('Sensor Rest Service', function () {
         afterEach(function (done) {
             // Cleanup
             if (connected) {
-                // console.log('disconnecting...');
                 ws.close();
                 done();
             } else {
@@ -770,7 +703,6 @@ describe('Sensor Rest Service', function () {
             dataToSend.lastReading.timestamp = nowTime;
 
             ws.on('message', function incoming(data, flags) {
-                // console.log(data);
                 data = JSON.parse(data)
                 data.should.have.property("reading");
                 data.should.have.property("timestamp");
