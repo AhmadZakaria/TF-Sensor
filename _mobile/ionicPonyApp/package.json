@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "^2.4.9",
     "@angular/platform-server": "^2.4.9",
     "@ionic/storage": "^2.0.1",
+    "es6-shim": "^0.35.3",
     "ionic-angular": "^2.2.0",
     "ionic-native": "^2.8.1",
     "ionicons": "3.0.0",
@@ -28,14 +29,15 @@
     "q": "^1.4.1",
     "rxjs": "^5.2.0",
     "sw-toolbox": "^3.6.0",
-    "zone.js": "^0.8.1"
+    "zone.js": "^0.8.2"
   },
   "devDependencies": {
+    "@angular/cli": "*",
     "@ionic/app-scripts": "^1.1.4",
     "@types/jasmine": "^2.5.45",
     "@types/node": "^7.0.8",
     "angular-cli": "^1.0.0-beta.28.3",
-    "codecov": "^1.0.1",
+    "codecov": "^2.0.1",
     "gulp-tsc": "^1.2.6",
     "jasmine-core": "^2.5.2",
     "jasmine-spec-reporter": "^3.2.0",

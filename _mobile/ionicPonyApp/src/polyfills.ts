@@ -1,3 +1,8 @@
+import 'es6-shim';
+import 'zone.js/dist/zone'; // You are missing this one
+import 'zone.js/dist/long-stack-trace-zone';
+import 'reflect-metadata';
+
 export class ConfigMock {
  
   public get(): any {

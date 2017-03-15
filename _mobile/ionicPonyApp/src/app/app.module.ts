@@ -4,6 +4,7 @@ import { MyApp } from './app.component';
 import { ControlPanel } from '../pages/controlPanel/controlPanel';
 import { ContactPage } from '../pages/contact/contact';
 import { TabsPage } from '../pages/tabs/tabs';
+import { PonyApp } from '../providers/pony-app';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,6 @@ import { TabsPage } from '../pages/tabs/tabs';
     ContactPage,
     TabsPage
   ],
-  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}]
+  providers: [{ provide: ErrorHandler, useClass: IonicErrorHandler }, PonyApp]
 })
-export class AppModule {}
+export class AppModule { }
