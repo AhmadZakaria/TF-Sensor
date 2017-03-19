@@ -21,14 +21,13 @@ import 'rxjs/add/operator/map';
 import { Device } from 'ionic-native';
 import { InAppBrowser } from 'ionic-native';
 
-
 @Component({
-  selector: 'page-controlPanel',
-  templateUrl: 'controlPanel.html'
+  selector: 'page-control-panel',
+  templateUrl: 'controlPanel.page.html'
 })
 export class ControlPanel {
   acc = 0.0;
-  img_pony = "asfalt-light.png";
+  imgPony = "asfalt-light.png";
   handle = undefined;
   started = false;
   serverIP = undefined;
@@ -48,7 +47,7 @@ export class ControlPanel {
 
   registerPonySensor(event) {
     // Build the post string from an object
-    var post_data = {
+    var postData = {
       "type": "Accelerometer",
       "frequency": "500",
       "UID": this.deviceID,
@@ -57,7 +56,7 @@ export class ControlPanel {
       "unit": "m/s^2"
     };
 
-    var body = JSON.stringify(post_data);
+    var body = JSON.stringify(postData);
     var headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -87,14 +86,14 @@ export class ControlPanel {
     event.preventDefault();
 
     if (this.started) {
-      this.img_pony = "char_rarity.png";
+      this.imgPony = "char_rarity.png";
       this.started = false;
       this.sensorStatus = "radio-button-off"
 
       clearInterval(this.handle);
       console.log("Stopping!");
     } else {
-      this.img_pony = "char_fluttershy.png";
+      this.imgPony = "char_fluttershy.png";
 
       this.started = true;
       this.sensorStatus = "radio-button-on"
