@@ -184,7 +184,8 @@
     "cordova-plugin-device",
     "cordova-plugin-splashscreen",
     "ionic-plugin-keyboard",
-    "cordova-plugin-device-motion"
+    "cordova-plugin-device-motion",
+    "cordova-plugin-inappbrowser"
   ],
   "config": {
     "commitizen": {
