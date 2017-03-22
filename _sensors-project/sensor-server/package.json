@@ -46,7 +46,7 @@
   "scripts": {
     "start": "node ./index",
     "test": "mocha -R spec -t 10000  test/*.js",
-    "test-coverage": "nyc  --reporter=lcov npm run test ;  nyc report",
-    "coveralls": "cat ./server-coverage/lcov.info | ./node_modules/.bin/coveralls"
+    "test-coverage": "nyc --reporter=lcov --reporter=json --report-dir=../../coverage/server-coverage npm run test; nyc report",
+    "coveralls": "cat ./coverage/server-coverage/lcov.info | ./node_modules/.bin/coveralls"
   }
 }

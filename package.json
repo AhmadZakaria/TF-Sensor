@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "coveralls": "^2.11.16",
+    "istanbul-combine": "^0.3.0",
     "mocha": "^3.2.0",
     "nyc": "^10.1.2"
   },
@@ -27,8 +28,8 @@
     "postinstall": "npm link ./_sensors-project/sensor-server/ && npm link ./_sensors-project/phone-sensor/ && npm link ./_sensors-project/tf-sensor/ ",
     "start": "cd ./_sensors-project/sensor-server/ &&  node index",
     "test": "cd ./_sensors-project/sensor-server/ &&  npm run test",
-    "test-coverage": "cd ./_sensors-project/sensor-server/ && nyc --reporter=lcov --report-dir=../../server-coverage npm run test; nyc report",
-    "report-coverage": "cat ./server-coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "test-coverage": "cd ./_sensors-project/sensor-server/ && npm run test-coverage ; cd ../../_mobile/ionicPonyApp/ && npm test ; cd ../../ && node combine-tests.js",
+    "report-coverage": "cat ./coverage/all/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "nyc": {
     "include": [

@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 
 import { NavController } from 'ionic-angular';
 import {
-  AlertController,
   Platform,
 } from 'ionic-angular';
 
@@ -30,7 +29,7 @@ export class ControlPanel {
   sensorStatus: string = 'radio-button-off';
   deviceID: any = undefined;
 
-  constructor(public navCtrl: NavController, public alertCtrl: AlertController, public http: Http, platform: Platform) {
+  constructor(public navCtrl: NavController, public http: Http, platform: Platform) {
     this.http.get('config.json').map(res => res.json()).subscribe(data => {
       this.serverIP = data.serverIP;
     });
@@ -39,7 +38,9 @@ export class ControlPanel {
     });
   }
 
-  registerPonySensor() {
+  registerPonySensor(event: any) {
+        event.preventDefault();
+
     // Build the post string from an object
     let postData = {
       'type': 'Accelerometer',
@@ -73,7 +74,7 @@ export class ControlPanel {
       );
   }
 
-  clickedAlert() {
+  clickedAlert(event: any) {
     event.preventDefault();
 
     if (this.started) {
@@ -105,7 +106,9 @@ export class ControlPanel {
     }
   }
 
-  opendash() {
+  opendash(event: any) {
+    event.preventDefault();
+
     let dashURL = 'http://' + this.serverIP + ':8080/dashboard.html';
     let ref = new InAppBrowser(dashURL, '_self');
     ref.show();
