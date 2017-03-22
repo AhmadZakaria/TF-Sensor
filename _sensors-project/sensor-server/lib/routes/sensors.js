@@ -248,7 +248,8 @@ module.exports = class Sensors {
             case "PUT":
                 sensor.stop();
 
-                if (request.body.target != sensor.target) {
+                // sensor target is not subject to change.
+                if (request.body.hasOwnProperty('target') && request.body.target != sensor.target) {
                     response.format({
                         "default": () => {
                             next(new httpError.NotAcceptable());
@@ -258,20 +259,29 @@ module.exports = class Sensors {
                     break;
                 }
 
+                // get old options
+                let newOptions = sensor.sensorOptions;
+                // modify requested options, and keep the rest
+                for (let newopt in request.body) {
+                    if (request.body.hasOwnProperty(newopt)) {
+                        newOptions[newopt] = request.body[newopt];
+                    }
+                }
+
                 sensors.delete(sensor.id); //Delete because of reintiasation of the Tinkerforge
 
-                if (request.body.target === 'Tinkerforge') {
+                if (newOptions.target === 'Tinkerforge') {
 
                     sensorOptions = sensorOptions.filter(i => i.UID != sensor.id)
-                    sensor = new typeHardwareSensor(request.body);
-                    sensorOptions.push(request.body);
+                    sensor = new typeHardwareSensor(newOptions);
+                    sensorOptions.push(newOptions);
                     // var json = JSON.stringify(sensorOptions);
                     // fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
                     //console.log("Writing successful (sensors POST" + sensor.id + " )!");
                     // });
 
                 } else {
-                    sensor = new typePhoneSensor(request.body);
+                    sensor = new typePhoneSensor(newOptions);
                     sensor.onchange = event => {
 
                         let sensorResponse = {
@@ -287,7 +297,7 @@ module.exports = class Sensors {
                     };
                 }
 
-                if (request.body.active == true) {
+                if (newOptions.active == true) {
                     sensor.start();
                 }
 
