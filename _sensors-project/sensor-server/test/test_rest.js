@@ -389,8 +389,7 @@ describe('Sensor Rest Service', function () {
         });
 
         it('Change tf-sensor frequency', (done) => {
-            let newOpts = TFSensorOptions.humiditySensorOptions;
-            newOpts.frequency = '600';
+            let newOpts = { frequency: '600' };
 
             agent
                 .put('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
