@@ -13,7 +13,7 @@ module.exports = class DefaultRouter extends require("express").Router
         this.get("/index.html", require("./routes/dashboard"));
         this.get("/dashboard.html", require("./routes/dashboard"));
         this.get("/license.html", require("./routes/license"));
-        this.get("/error.html", require("./routes/error"));
+        // this.get("/error.html", require("./routes/error"));
 
         /* ===== 404 Error handling ===== */
         this.use(require("./mw/_404"));

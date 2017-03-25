@@ -20,7 +20,7 @@ Note: if the last command fails for lack of permissions, try again with ```sudo`
 ```sh
 # to run mocha tests:
 npm test
-# to run istanbuljs/nyc code coverage and generate report (also runs mocha tests)
+# to run  code coverage and generate report (runs tests for sensors server as well as mobile app)
 npm run test-coverage
 # to report test coverage to coveralls
 npm run report-coverage
