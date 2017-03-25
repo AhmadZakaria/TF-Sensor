@@ -79,7 +79,7 @@ describe('Sensor Rest Service', function () {
 
 
         it('CREATE deactivated TF sensor', function (done) {
-            let senOpts = TFSensorOptions.soundSensorOptions;
+            let senOpts = JSON.parse(JSON.stringify(TFSensorOptions.soundSensorOptions));
             senOpts.UID = "asde";
             senOpts.active = false;
             agent
@@ -92,7 +92,7 @@ describe('Sensor Rest Service', function () {
         });
 
         it('CREATE duplicate TF sensor', function (done) {
-            let senOpts = TFSensorOptions.soundSensorOptions;
+            let senOpts = JSON.parse(JSON.stringify(TFSensorOptions.soundSensorOptions));
             senOpts.UID = "asde";
             senOpts.active = false;
             agent
@@ -107,7 +107,7 @@ describe('Sensor Rest Service', function () {
         });
 
         it('CREATE duplicate TF sensor, with unknown accept type', function (done) {
-            let senOpts = TFSensorOptions.soundSensorOptions;
+            let senOpts = JSON.parse(JSON.stringify(TFSensorOptions.soundSensorOptions));
             senOpts.UID = "asde";
             senOpts.active = false;
             agent
@@ -121,7 +121,7 @@ describe('Sensor Rest Service', function () {
         });
 
         it('CREATE new TF sensor, with unknown accept type', function (done) {
-            let senOpts = TFSensorOptions.soundSensorOptions;
+            let senOpts = JSON.parse(JSON.stringify(TFSensorOptions.soundSensorOptions));
             senOpts.UID = "asde2";
             senOpts.active = false;
             agent
@@ -456,14 +456,14 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
-         it('Try to change sensor target', (done) => {
+        it('Try to change sensor target', (done) => {
             let newOpts = JSON.parse(JSON.stringify(TFSensorOptions.humiditySensorOptions));
             newOpts.target = 'somethingelse';
 
             agent
                 .put('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
                 .set("content-type", "application/json")
-                .set("accept","application/pdf")
+                .set("accept", "application/pdf")
                 .send(newOpts)
                 .end((err, res) => {
                     res.should.have.status(406);
@@ -471,7 +471,7 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
-    it('Try to change UID of a sensor', (done) => {
+        it('Try to change UID of a sensor', (done) => {
             let newOpts = JSON.parse(JSON.stringify(TFSensorOptions.humiditySensorOptions));
             newOpts.UID = 'somethingelse';
 
@@ -485,14 +485,14 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
-          it('Try to change UID of a sensor', (done) => {
+        it('Try to change UID of a sensor', (done) => {
             let newOpts = JSON.parse(JSON.stringify(TFSensorOptions.humiditySensorOptions));
             newOpts.UID = 'somethingelse';
 
             agent
                 .put('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
                 .set("content-type", "application/json")
-                .set("accept","application/pdf")
+                .set("accept", "application/pdf")
                 .send(newOpts)
                 .end((err, res) => {
                     res.should.have.status(406);
@@ -761,6 +761,85 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
+
+
+        it('should receive data via websocket after creating new TF sensor', function (done) {
+            let dataToSend = {
+                "lastReading": {
+                    "value": 60,
+                    "timestamp": 1487538472000
+                }
+            };
+
+            nowTime = Date.now();
+            dataToSend.lastReading.timestamp = nowTime;
+
+            ws.on('message', function incoming(data, flags) {
+                data = JSON.parse(data)
+                data.should.have.property("reading");
+                data.should.have.property("timestamp");
+                data.reading.should.eq(dataToSend.lastReading.value);
+                data.timestamp.should.eq(dataToSend.lastReading.timestamp);
+                done();
+            });
+
+            let senOpts = JSON.parse(JSON.stringify(TFSensorOptions.soundSensorOptions));
+            senOpts.UID = "asde2";
+            senOpts.active = false;
+            agent
+                .post('/api/sensors')
+                .send(senOpts)
+                .end((err, res) => {
+                    res.should.have.status(201);
+                });
+            agent
+                .post('/api/sensors/' + "asde2" + '/sensorReadings/latest')
+                .send(dataToSend)
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    res.should.have.status(201);
+                });
+        });
+
+        it('should receive data via websocket after updating existing TF sensor', function (done) {
+            let dataToSend = {
+                "lastReading": {
+                    "value": 60,
+                    "timestamp": 1487538472000
+                }
+            };
+
+            nowTime = Date.now();
+            dataToSend.lastReading.timestamp = nowTime;
+
+            ws.on('message', function incoming(data, flags) {
+                data = JSON.parse(data)
+                data.should.have.property("reading");
+                data.should.have.property("timestamp");
+                data.reading.should.eq(dataToSend.lastReading.value);
+                data.timestamp.should.eq(dataToSend.lastReading.timestamp);
+                done();
+            });
+
+            let newOpts = { frequency: '600' };
+
+            agent
+                .put('/api/sensors/' + "asde2")
+                .set("content-type", "application/json")
+                .send(newOpts)
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    res.should.have.status(200);
+                });
+
+            agent
+                .post('/api/sensors/' + "asde2" + '/sensorReadings/latest')
+                .send(dataToSend)
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    res.should.have.status(201);
+                });
+        });
 
 
     });
