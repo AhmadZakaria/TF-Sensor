@@ -40,8 +40,8 @@
     "scss-lint": "scss-lint",
     "outdated": "npm outdated --depth 0",
     "post-install": "webdriver-manager update",
-    "precommit": "npm run lint && npm run scss-lint",
-    "prepush": "npm test",
+    "precommit": "",
+    "prepush": "",
     "commitmsg": "validate-commit-msg"
   },
   "betterScripts": {
