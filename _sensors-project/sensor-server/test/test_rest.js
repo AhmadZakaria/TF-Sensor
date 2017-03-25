@@ -145,6 +145,32 @@ describe('Sensor Rest Service', function () {
                 });
         });
 
+
+        it('CREATE phone sensor without UID', function (done) {
+            let withoutUID = JSON.parse(JSON.stringify(TFSensorOptions.phoneSensorOptions));
+            delete withoutUID.UID;
+            agent
+                .post('/api/sensors')
+                .send(withoutUID)
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
+        it('CREATE phone sensor without UID and with wrong accept format', function (done) {
+            let withoutUID = JSON.parse(JSON.stringify(TFSensorOptions.phoneSensorOptions));
+            delete withoutUID.UID;
+            agent
+                .post('/api/sensors')
+                .send(withoutUID)
+                .set("accept", "application/pdf")
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
         it('GET phone sensor', function (done) {
             agent
                 .get('/api/sensors')
