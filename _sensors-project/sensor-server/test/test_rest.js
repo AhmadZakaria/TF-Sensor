@@ -318,7 +318,7 @@ describe('Sensor Rest Service', function () {
         };
 
         let nowTime = Date.now();
-        phoneReadingPost.lastReading.value = 70;
+        phoneReadingPost.lastReading.value = 70.3;
         phoneReadingPost.lastReading.timestamp = nowTime;
 
         it('SEND readings from phone sensor', function (done) {
@@ -377,13 +377,13 @@ describe('Sensor Rest Service', function () {
 
     describe('Sensor', function () {
 
-        it('GET 1 sensor', (done) => {
+        it('GET sensor', (done) => {
             agent
                 .get('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.body.should.have.property('id');
-                    res.body.id.should.be.eql(TFSensorOptions.humiditySensorOptions.UID);
+                    res.body.should.have.property('UID');
+                    res.body.UID.should.be.eql(TFSensorOptions.humiditySensorOptions.UID);
                     done();
                 });
         });
@@ -548,35 +548,6 @@ describe('Sensor Rest Service', function () {
                 .get('/dashboard')
                 .end((err, res) => {
                     res.should.have.status(404);
-                    done();
-                });
-        });
-
-        it('should return error', function (done) {
-            agent
-                .get('/error.html')
-                .end((err, res) => {
-                    res.should.have.status(500);
-                    done();
-                });
-        });
-
-        it('should return error', function (done) {
-            agent
-                .get('/error.html')
-                .set("accept", "text/html")
-                .end((err, res) => {
-                    res.should.have.status(500);
-                    done();
-                });
-        });
-
-        it('should return error', function (done) {
-            agent
-                .get('/error.html')
-                .set("accept", "application/xhtml+xml")
-                .end((err, res) => {
-                    res.should.have.status(500);
                     done();
                 });
         });

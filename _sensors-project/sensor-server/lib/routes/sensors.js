@@ -119,6 +119,20 @@ module.exports = class Sensors {
                 });
                 break;
             case "POST":
+                if (!request.body.hasOwnProperty("UID")) {
+                    response.format({
+                        "application/json": () => {
+                            response.status(406).json({
+                                "error": "Sensor must have a UID"
+                            });
+                        },
+                        "default": () => {
+                            next(new httpError.NotAcceptable());
+                        }
+                    });
+                    break;
+                }
+
                 if (sensors.has(request.body.UID)) {
                     response.format({
                         "application/json": () => {
@@ -145,6 +159,20 @@ module.exports = class Sensors {
                         //console.log("Writing successful (sensors POST" + sensor.id + " )!");
                         // });
 
+                        sensor.onchange = event => {
+                            // console.log(
+                            // `${new Date(event.reading.timestamp).toLocaleTimeString()} ${event.reading.tfValue}`);
+                            let sensorResponse = {
+                                id: sensor.id,
+                                type: sensor.Type,
+                                reading: event.value,
+                                timestamp: event.timestamp,
+                                unit: sensor.unit
+                            };
+
+                            wss.broadcast(sensorResponse);
+                            sensor.lastReading = event;
+                        }
 
                     } else {
                         sensor = new typePhoneSensor(request.body);
@@ -208,12 +236,12 @@ module.exports = class Sensors {
             return;
         }
 
-        let sensorResponse = {
-            id: sensor.id,
-            type: sensor.Type,
-            frequency: sensor.sensorOptions.frequency
-        }
-
+        // let sensorResponse = {
+        //     id: sensor.id,
+        //     type: sensor.Type,
+        //     frequency: sensor.sensorOptions.frequency
+        // }
+        let sensorResponse = sensor.sensorOptions;
 
         switch (request.method) {
             case "GET":
@@ -251,6 +279,23 @@ module.exports = class Sensors {
                 // sensor target is not subject to change.
                 if (request.body.hasOwnProperty('target') && request.body.target != sensor.target) {
                     response.format({
+                        "application/json": () => {
+                            response.status(406).send({ "error": "Target cannot be changed" });
+                        },
+                        "default": () => {
+                            next(new httpError.NotAcceptable());
+                        }
+                    });
+
+                    break;
+                }
+
+                // sensor UID is also not subject to change.
+                if (request.body.hasOwnProperty('UID') && request.body.UID != sensor.id) {
+                    response.format({
+                        "application/json": () => {
+                            response.status(406).send({ "error": "UID cannot be changed" });
+                        },
                         "default": () => {
                             next(new httpError.NotAcceptable());
                         }
@@ -279,6 +324,19 @@ module.exports = class Sensors {
                     // fs.writeFile('TFSensorOptions.json', json, 'utf8', () => {
                     //console.log("Writing successful (sensors POST" + sensor.id + " )!");
                     // });
+                    sensor.onchange = event => {
+
+                        let sensorResponse = {
+                            id: sensor.id,
+                            type: sensor.Type,
+                            reading: event.value,
+                            timestamp: event.timestamp,
+                            unit: sensor.unit
+                        };
+
+                        wss.broadcast(sensorResponse);
+                        sensor.lastReading = event;
+                    };
 
                 } else {
                     sensor = new typePhoneSensor(newOptions);
@@ -360,7 +418,7 @@ module.exports = class Sensors {
             case "POST":
                 sensor.lastReading = new TFSensorReading(
                     parseInt(request.body.lastReading.timestamp),
-                    parseInt(request.body.lastReading.value));
+                    parseFloat(request.body.lastReading.value));
                 sensorResponse = {
                     value: sensor.lastReading.value,
                     timestamp: sensor.lastReading.timestamp

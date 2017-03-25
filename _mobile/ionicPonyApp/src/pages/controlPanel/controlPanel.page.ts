@@ -31,7 +31,7 @@ export class ControlPanel {
 
   constructor(public navCtrl: NavController, public http: Http, platform: Platform) {
     this.http.get('config.json').map(res => res.json()).subscribe(data => {
-      this.serverIP = data.serverIP;
+    this.serverIP = data.serverIP;
     });
     platform.ready().then(() => {
       this.deviceID = 'AccX-' + Device.uuid;
@@ -39,7 +39,7 @@ export class ControlPanel {
   }
 
   registerPonySensor(event: any) {
-        event.preventDefault();
+    event.preventDefault();
 
     // Build the post string from an object
     let postData = {
@@ -71,7 +71,7 @@ export class ControlPanel {
         this.statusColor = 'danger';
       },
       () => console.log('Something Complete'),
-      );
+    );
   }
 
   clickedAlert(event: any) {
@@ -133,7 +133,7 @@ export class ControlPanel {
       () => { },
       (err) => { console.log('Errorr: ' + err); },
       () => console.log('Something Complete'),
-      );
+    );
 
   }
 
