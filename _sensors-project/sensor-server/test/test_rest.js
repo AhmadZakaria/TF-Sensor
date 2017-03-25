@@ -429,7 +429,7 @@ describe('Sensor Rest Service', function () {
         });
 
         it('Change tf-sensor frequency with wrong accept type', (done) => {
-            let newOpts = TFSensorOptions.humiditySensorOptions;
+            let newOpts = JSON.parse(JSON.stringify(TFSensorOptions.humiditySensorOptions));
             newOpts.frequency = '300';
 
             agent
@@ -443,7 +443,7 @@ describe('Sensor Rest Service', function () {
         });
 
         it('Try to change sensor target', (done) => {
-            let newOpts = TFSensorOptions.humiditySensorOptions;
+            let newOpts = JSON.parse(JSON.stringify(TFSensorOptions.humiditySensorOptions));
             newOpts.target = 'somethingelse';
 
             agent
@@ -455,6 +455,51 @@ describe('Sensor Rest Service', function () {
                     done();
                 });
         });
+
+         it('Try to change sensor target', (done) => {
+            let newOpts = JSON.parse(JSON.stringify(TFSensorOptions.humiditySensorOptions));
+            newOpts.target = 'somethingelse';
+
+            agent
+                .put('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
+                .set("content-type", "application/json")
+                .set("accept","application/pdf")
+                .send(newOpts)
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
+    it('Try to change UID of a sensor', (done) => {
+            let newOpts = JSON.parse(JSON.stringify(TFSensorOptions.humiditySensorOptions));
+            newOpts.UID = 'somethingelse';
+
+            agent
+                .put('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
+                .set("content-type", "application/json")
+                .send(newOpts)
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
+          it('Try to change UID of a sensor', (done) => {
+            let newOpts = JSON.parse(JSON.stringify(TFSensorOptions.humiditySensorOptions));
+            newOpts.UID = 'somethingelse';
+
+            agent
+                .put('/api/sensors/' + TFSensorOptions.humiditySensorOptions.UID)
+                .set("content-type", "application/json")
+                .set("accept","application/pdf")
+                .send(newOpts)
+                .end((err, res) => {
+                    res.should.have.status(406);
+                    done();
+                });
+        });
+
 
         it('GET changed tf-sensor frequency', (done) => {
             agent
