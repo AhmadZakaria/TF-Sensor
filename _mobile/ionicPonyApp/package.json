@@ -41,7 +41,7 @@
     "outdated": "npm outdated --depth 0",
     "post-install": "webdriver-manager update",
     "precommit": "",
-    "prepush": "",
+    "prepush": " ",
     "commitmsg": "validate-commit-msg"
   },
   "betterScripts": {
