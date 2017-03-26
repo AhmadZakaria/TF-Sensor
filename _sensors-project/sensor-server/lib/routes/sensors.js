@@ -6,10 +6,11 @@ const http = require("http");
 const TFSensor = require('tf-sensor/lib/TFSensor');
 const TFSensorReading = require('tf-sensor/lib/TFSensorReading');
 const PhoneSensor = require('phone-sensor/lib/PhoneSensor');
+const PhoneSensorReading = require('phone-sensor/lib/PhoneSensorReading');
 const WebSocket = require('ws');
 const fs = require('fs');
 const SensorState = require('generic-sensor-api/api/SensorState');
-
+const request = require("request");
 
 //const TFSensorOptions = require('../../../tf-sensor/lib/TFSensorOptions');
 
@@ -71,6 +72,27 @@ module.exports = class Sensors {
             sensor.start();
             sensors.set(sensor.id, sensor);
         }
+
+        setInterval(() => {
+            sensorOptions.forEach(sen => {
+                request.post(
+                    'http://localhost:8080/api/sensors/' + sen.UID + "/sensorReadings/latest",
+                    {
+                        json: {
+                            "lastReading": {
+                                "value": 50 * Math.random(),
+                                "timestamp": Date.now() + 1
+                            }
+                        }
+                    },
+                    function (error, response, body) {
+                        if (!error && response.statusCode == 200) {
+                            console.log(body)
+                        }
+                    }
+                );
+            })
+        }, 1000);
 
         // Array
         //     .from(sensors.entries())
@@ -416,7 +438,7 @@ module.exports = class Sensors {
                 });
                 break;
             case "POST":
-                sensor.lastReading = new TFSensorReading(
+                sensor.lastReading = new PhoneSensorReading(
                     parseInt(request.body.lastReading.timestamp),
                     parseFloat(request.body.lastReading.value));
                 sensorResponse = {
