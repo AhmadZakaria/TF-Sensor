@@ -18,13 +18,6 @@
 
         let sensors = {};
 
-
-        let dataMap = new Map();
-        // let divMap = new Map();
-        // let lineChartMap = new Map();
-        // let gaugeChartMap = new Map();
-        let lockMap = new Map();
-
         let options_line = {
             legend: 'none',
             hAxis: {
@@ -172,7 +165,7 @@
                 ['Label', 'Value'],
                 [label, 0],
             ]);
-            sensors[_id].lock = true;;
+            sensors[_id].lock = true;
 
 
             let data_line = new google.visualization.DataTable();
