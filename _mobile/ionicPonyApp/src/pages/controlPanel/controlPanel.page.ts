@@ -1,41 +1,39 @@
-import { Component } from '@angular/core';
+import { Injectable, Component } from '@angular/core';
 
 import { NavController } from 'ionic-angular';
 import {
   Platform,
 } from 'ionic-angular';
-
+import { Device } from 'ionic-native'
 import { DeviceMotion } from 'ionic-native';
 import {
   Http,
   Headers,
 } from '@angular/http';
 import 'rxjs/add/operator/map';
-import { Device } from 'ionic-native';
 import { InAppBrowser } from 'ionic-native';
 
 @Component({
   selector: 'ib-page-control-panel',
   templateUrl: 'controlPanel.page.html',
 })
+@Injectable()
 export class ControlPanel {
   acc: number = 0.0;
   imgPony: string = 'asfalt-light.png';
   handle: any = undefined;
   started: boolean = false;
-  serverIP: string = undefined;
+  public serverIP: string = undefined;
   connectionStatus: string = 'Disconnected';
   statusColor: string = 'light';
   sensorStatus: string = 'radio-button-off';
   deviceID: any = undefined;
 
-  constructor(public navCtrl: NavController, public http: Http, platform: Platform) {
+  constructor(public navCtrl: NavController, public http: Http) {
     this.http.get('config.json').map(res => res.json()).subscribe(data => {
-    this.serverIP = data.serverIP;
+      this.serverIP = data.serverIP;
     });
-    platform.ready().then(() => {
-      this.deviceID = 'AccX-' + Device.uuid;
-    });
+    this.deviceID = 'AccX-' + Device.uuid;
   }
 
   registerPonySensor(event: any) {
@@ -69,9 +67,8 @@ export class ControlPanel {
         console.log('Errorr: ' + err);
         this.connectionStatus = 'Error';
         this.statusColor = 'danger';
-      },
-      () => console.log('Something Complete'),
-    );
+      }
+      );
   }
 
   clickedAlert(event: any) {
@@ -132,7 +129,6 @@ export class ControlPanel {
       .subscribe(
       () => { },
       (err) => { console.log('Errorr: ' + err); },
-      () => console.log('Something Complete'),
     );
 
   }
