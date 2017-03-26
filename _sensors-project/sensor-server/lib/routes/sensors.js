@@ -73,26 +73,29 @@ module.exports = class Sensors {
             sensors.set(sensor.id, sensor);
         }
 
-        setInterval(() => {
-            sensorOptions.forEach(sen => {
-                request.post(
-                    'http://localhost:8080/api/sensors/' + sen.UID + "/sensorReadings/latest",
-                    {
-                        json: {
-                            "lastReading": {
-                                "value": 50 * Math.random(),
-                                "timestamp": Date.now() + 1
-                            }
-                        }
-                    },
-                    function (error, response, body) {
-                        if (!error && response.statusCode == 200) {
-                            console.log(body)
-                        }
-                    }
-                );
-            })
-        }, 1000);
+
+        // for testing purposes
+
+        // setInterval(() => {
+        //     sensorOptions.forEach(sen => {
+        //         request.post(
+        //             'http://localhost:8080/api/sensors/' + sen.UID + "/sensorReadings/latest",
+        //             {
+        //                 json: {
+        //                     "lastReading": {
+        //                         "value": 50 * Math.random(),
+        //                         "timestamp": Date.now() + 1
+        //                     }
+        //                 }
+        //             },
+        //             function (error, response, body) {
+        //                 if (!error && response.statusCode == 200) {
+        //                     console.log(body)
+        //                 }
+        //             }
+        //         );
+        //     })
+        // }, 1000);
 
         // Array
         //     .from(sensors.entries())
