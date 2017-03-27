@@ -42,6 +42,8 @@ var TFSensorOptions = {
         simpleFunc: 'getIlluminance',
         // sensor UID
         UID: 'yih',
+        target: 'Tinkerforge',
+
         "active": "true",
         unit: "lux"
     },
@@ -62,6 +64,8 @@ var TFSensorOptions = {
         simpleFunc: 'getHumidity',
         // sensor UID
         UID: 'xDM',
+        target: 'Tinkerforge',
+
         "active": "true",
         unit: "%"
 
@@ -82,6 +86,8 @@ var TFSensorOptions = {
         simpleFunc: 'getIntensity',
         // sensor UID
         UID: 'vqY',
+        target: 'Tinkerforge',
+
         "active": "true",
         unit: "W/m^2"
     }

@@ -57,7 +57,7 @@ module.exports = class Sensors {
             // sensor.onactivate = event => console.log('activated');
             sensor.onchange = event => {
                 // console.log(
-                // `${new Date(event.reading.timestamp).toLocaleTimeString()} ${event.reading.tfValue}`);
+                // `${new Date(event.timestamp).toLocaleTimeString()} ${event.value}`);
                 let sensorResponse = {
                     id: sensor.id,
                     type: sensor.Type,

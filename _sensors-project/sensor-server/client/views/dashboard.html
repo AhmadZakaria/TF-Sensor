@@ -202,11 +202,10 @@
         function init() {
             output = document.getElementById("output");
             initWebSocket();
-            setInterval(timestep, 800);
+            setInterval(timestep, 200);
         }
 
         function errorHandler(error) {
-            console.log(JSON.stringify(error));
             google.visualization.errors.removeError(error.id);
             // console.log("ERROR: " + error.message + " :: " + error.detailedMessage + " :: " + JSON.stringify(error.options))
             google.visualization.errors.addError(output, error.message, error.detailedMessage, error.options);
@@ -248,6 +247,7 @@
         }
 
         function updateChart(data) {
+                        
             sensors[data.id].gaugeData.setValue(0, 1, data.reading);
 
             sensors[data.id].data.push([new Date(data.timestamp), data.reading]);

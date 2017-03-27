@@ -24,7 +24,12 @@ module.exports = class TFSensor extends Sensor {
         this.sen.on(Tinkerforge[sensorOptions.ctor][sensorOptions.callbackEvent],
             // Callback function for illuminance callback (parameter has unit Lux/100)
             (measurement) => {
-                this.lastReading = measurement / this.sensorOptions.normFact
+                 let nowTime = Date.now();
+                        this.lastReadingTime = nowTime;
+                this.lastReading = new TFSensorReading(
+                            this.lastReadingTime,
+                            measurement / this.sensorOptions.normFact
+                        )
                 // console.log(this._type+': ' + this.lastReading + ' Lux');
             }
         );
@@ -32,10 +37,7 @@ module.exports = class TFSensor extends Sensor {
     }
 
     handleStarted() {
-        this.ipcon.connect(HOST, PORT,
-            function (error) {
-                console.log('Error: ' + error);
-            }
+        this.ipcon.connect(HOST, PORT, error => console.log('Error: ' + error)
         ); // Connect to brickd
         // Don't use device before ipcon is connected
 
@@ -48,26 +50,28 @@ module.exports = class TFSensor extends Sensor {
                 // get first reading
                 this.sen[this.sensorOptions.simpleFunc](
                     (measurement) => {
-                        //    console.log('Illuminance: ' + measurement/100.0 + ' Lux');
-                        this.lastReading = measurement / this.sensorOptions.normFact
                         let nowTime = Date.now();
                         this.lastReadingTime = nowTime;
+                        //    console.log('Illuminance: ' + measurement/100.0 + ' Lux');
+                        this.lastReading = new TFSensorReading(
+                            this.lastReadingTime,
+                            measurement / this.sensorOptions.normFact
+                        )
+                        this.onchange(
+                            this.lastReading
+                        );
                     }, () => { }
                 );
                 return new Promise((resolve, reject) => {
                     this._intervalHandle = setInterval(
                         () => {
-                            if (this.lastBroadcastTime != this.lastReadingTime) { // new un-broadcasted reading
-                                let tfSensorReading = new TFSensorReading(
-                                    this.lastReadingTime,
-                                    this.lastReading
-                                )
+                            // if (this.lastBroadcastTime != this.lastReadingTime) { // new un-broadcasted reading
 
-                                this.onchange({
-                                    reading: tfSensorReading
-                                });
+                                this.onchange(
+                                    this.lastReading
+                                );
                                 this.lastBroadcastTime = this.lastReadingTime; // mark reading as broadcasted
-                            }
+                            // }
                         },
                         this.sensorOptions.frequency
                     );
